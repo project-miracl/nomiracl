@@ -10,6 +10,9 @@
     <a href="https://github.com/project-miracl/nomiracl/blob/main/LICENSE">
         <img alt="License" src="https://img.shields.io/github/license/project-miracl/nomiracl.svg?style=flat&colorB=green">
     </a>
+    <a href="https://arxiv.org/abs/2312.11361">
+        <img alt="arXiv" src="https://img.shields.io/badge/arXiv-2312.11361-b31b1b.svg">
+    </a>
 </p>
 
 <h4 align="center">
