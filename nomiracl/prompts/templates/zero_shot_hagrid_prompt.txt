@@ -1,0 +1,23 @@
+I will give a question and several context texts about the question.
+Based on the given contexts, give a brief answer to the question. 
+Also, mention the reference of parts of your answer based on the given contexts
+within brackets [] as in the IEEE format.
+
+If none of the contexts provide an answer the question, write "No Answer" in the answer section.
+
+QUESTION:
+{{query}}
+
+CONTEXTS:
+[1] {{passage_1}}
+[2] {{passage_2}}
+[3] {{passage_3}}
+[4] {{passage_4}}
+[5] {{passage_5}}
+[6] {{passage_6}}
+[7] {{passage_7}}
+[8] {{passage_8}}
+[9] {{passage_9}}
+[10] {{passage_10}}
+
+ANSWER:
