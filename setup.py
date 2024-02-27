@@ -25,7 +25,9 @@ setup(
     install_requires=[
         "torch",
         "transformers",
-        "openai"
+        "openai",
+        "tiktoken",
+        "bitsandbytes",
     ],
-    keywords="Transformer Networks BERT PyTorch NLP deep learning LLM Hallucination Evaluation"
+    keywords="Transformer Networks BERT PyTorch NLP deep learning LLM Hallucination"
 )
