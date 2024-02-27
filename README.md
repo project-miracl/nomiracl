@@ -182,7 +182,7 @@ An example datapoint under `./results/baselines/non_relevant/en.test.vanilla_pro
 | th   | Test | 250   | 46.80% | 4.00% | 90.40% | 67.20% | 0.0% | 16.40% | 0.0% | 0.80% | 4.40% | 5.60% | 11.20% |
 | yo   | Test | 250   | 75.20% | 74.80% | 95.20% | 89.20% | 0.0% | 1.20% | 0.4% | 12.80% | 13.60% | 14.80% | 20.00% |
 | zh   | Test | 250   | 56.40% | 43.60% | 86.80% | 78.40% | 0.0% | 6.00% | 0.0% | 5.20% | 4.40% | 10.80% | 9.20% |
-| Avg. | Test |  -    | 64.5% | 41.44% | 88.33% | 82.6% | 0.1% | 4.2% | 1.14% | 3.96% | 6.04% | 11.95% | 18.67% | 
+| Avg. | Test |  -    | **64.5%** | **41.44%** | **88.33%** | **82.6%** | **0.1%** | **4.2%** | **1.14%** | **3.96%** | **6.04%** | **11.95%** | **18.67%** | 
 
 
 ### Baseline Accuracy on NoMIRACL relevant subset (test split, maximum cap of 250 per language)
@@ -224,7 +224,7 @@ An example datapoint under `./results/baselines/relevant/en.test.vanilla_prompt.
 | th   | Test | 250  | 95.60% | 96.40% | 23.60% | 72.80% | 98.80% | 59.20% | 91.2% | 100.0% | 78.00% | 76.00% | 20.80% |
 | yo   | Test | 250  | 85.78% | 64.22% | 8.33% | 34.31% | 91.18% | 62.25% | 62.3% | 99.5% | 79.41% | 82.84% | 18.14% |
 | zh   | Test | 250  | 95.60% | 95.60% | 30.00% | 74.00% | 97.20% | 63.20% | 83.6% | 100.0% | 81.20% | 90.40% | 75.20% |
-| Avg. | Test |  -   | 84.77% | 85.97% | 25.09% | 59.51% | 92.84% | 56.04% | 72.68% | 99.8% | 73.50% | 79.69% | 37.47% |  
+| Avg. | Test |  -   | **84.77%** | **85.97%** | **25.09%** | **59.51%** | **92.84%** | **56.04%** | **72.68%** | **99.8%** | **73.50%** | **79.69%** | **37.47%** |  
 
 
 ## NoMIRACL Dataset Construction
@@ -253,7 +253,7 @@ We conduct a robustness evaluation using a binary classification task, comparing
 
 - **Error Rate:** `FN/(FN + TP)` Measures the model's inaccuracy in recognizing relevant passages in the relevant subset.
 
-### Collaboration and Acknowledgements
+## :handshake: Collaboration and Acknowledgements
 
 The NoMIRACL dataset has been made possible due to a collaborative effort of the following universities and organizations:
 
@@ -263,7 +263,7 @@ The NoMIRACL dataset has been made possible due to a collaborative effort of the
 Parts of the NoMIRACL code structure has been inspired by:
 - [https://github.com/McGill-NLP/instruct-qa](https://github.com/McGill-NLP/instruct-qa)
 
-## Citations
+## :scroll: Citations
 
 If you use NoMIRACL or parts in a research paper, please cite our work as follows:
 
