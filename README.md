@@ -19,9 +19,9 @@
     <footer>The image has been generated using miramuseai.net and Adobe Photoshop.</footer>
 </h4>
 
-NoMIRACL is multilingual robustness evaluation dataset across 18 diverse languages. It includes both a non-relevant and a relevant subset. The non-relevant subset contains queries with passages manually judged as non-relevant, while the relevant subset includes queries with at least one judged relevant passage. LLM robustness is measured using two key metrics: `hallucination rate` and `error rate`.
+NoMIRACL is multilingual hallucination evaluation dataset across 18 diverse languages. It includes both a non-relevant and a relevant subset. The non-relevant subset contains queries with passages manually judged as non-relevant, while the relevant subset includes queries with at least one judged relevant passage. LLM robustness is measured using two key metrics: `hallucination rate` and `error rate`.
 
->> This repository provides easy code to implement and evaluate diverse LLM baselines using our prompt template on NoMIRACL.
+**This repository provides easy code to implement and evaluate diverse LLM baselines using our prompt template on NoMIRACL.**
 
 For more information, checkout out our publication:
 - [NoMIRACL: Knowing When You Don't Know for Robust Multilingual Retrieval-Augmented Generation](https://arxiv.org/abs/2312.11361) (Thakur et al., ArXiv 2023)
@@ -253,14 +253,50 @@ We conduct a robustness evaluation using a binary classification task, comparing
 
 - **Error Rate:** `FN/(FN + TP)` Measures the model's inaccuracy in recognizing relevant passages in the relevant subset.
 
----
-### Collaboration
+### Collaboration and Acknowledgements
 
 The NoMIRACL dataset has been made possible due to a collaborative effort of the following universities and organizations:
 
 - University of Waterloo
 - Huawei Noah's Ark Lab
 
+Parts of the NoMIRACL code structure has been inspired by:
+- [https://github.com/McGill-NLP/instruct-qa](https://github.com/McGill-NLP/instruct-qa)
+
+## Citations
+
+If you use NoMIRACL or parts in a research paper, please cite our work as follows:
+
+```
+@article{thakur:2024,
+  author       = {Nandan Thakur and
+                  Luiz Bonifacio and
+                  Xinyu Zhang and
+                  Odunayo Ogundepo and
+                  Ehsan Kamalloo and
+                  David Alfonso{-}Hermelo and
+                  Xiaoguang Li and
+                  Qun Liu and
+                  Boxing Chen and
+                  Mehdi Rezagholizadeh and
+                  Jimmy Lin},
+  title        = {NoMIRACL: Knowing When You Don't Know for Robust Multilingual Retrieval-Augmented
+                  Generation},
+  journal      = {CoRR},
+  volume       = {abs/2312.11361},
+  year         = {2023},
+  url          = {https://doi.org/10.48550/arXiv.2312.11361},
+  doi          = {10.48550/ARXIV.2312.11361},
+  eprinttype    = {arXiv},
+  eprint       = {2312.11361},
+  timestamp    = {Tue, 16 Jan 2024 11:57:42 +0100},
+  biburl       = {https://dblp.org/rec/journals/corr/abs-2312-11361.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+```
+
+---
 Contact person: Nandan Thakur, [nandan.thakur@uwaterloo.co](mailto:nandan.thakur@uwaterloo.ca)
 
->> This repository contains experimental software and is published for the sole purpose of giving additional background details on the respective publication.
+> This repository contains experimental software and is published for the sole purpose of giving additional background details on the respective publication.
