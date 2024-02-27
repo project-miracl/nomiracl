@@ -16,7 +16,7 @@
 
 <h4 align="center">
     <a href="./"><img style="float: middle;" width="800" height="570" src="./images/nomiracl-teaser.png" /></a>
-    <footer>The image has been generated using miramuseai.net and Adobe Photoshop.</footer>
+    <footer><br clear="all"/>The image has been generated using miramuseai.net and Adobe Photoshop.</footer>
 </h4>
 
 NoMIRACL is multilingual hallucination evaluation dataset across 18 diverse languages. It includes both a non-relevant and a relevant subset. The non-relevant subset contains queries with passages manually judged as non-relevant, while the relevant subset includes queries with at least one judged relevant passage. LLM robustness is measured using two key metrics: `hallucination rate` and `error rate`.
