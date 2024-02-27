@@ -1,2 +1,2 @@
-from .generator import GPTx, OPT, Llama, Flan, PipelineGenerator, Vicuna, FalconPipelineGenerator
+from .generator import Llama, Flan, GPTx, Pipeline, Falcon, HFAutoModelCausalLM, GPTxAzure, BLOOM, Mistral
 from .utils import load_model

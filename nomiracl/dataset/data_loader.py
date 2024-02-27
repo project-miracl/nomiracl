@@ -57,14 +57,15 @@ class DataLoader:
 class NoMIRACLDataLoader(DataLoader):
     
     def __init__(self, 
-                 data_dir: str,
+                 data_dir: str = None,
                  split: str = "test",
                  language: str = "en",
                  corpus_file: str = "corpus.jsonl", 
                  query_files: Dict[str, str] = None, 
                  qrels_files: Dict[str, str] = None,
                  relevant: Dict[bool, str] = {True: "relevant", False: "non_relevant"}, 
-                 load_from_huggingface: bool = False):
+                 load_from_huggingface: bool = False,
+                 hf_dataset_name: str = "miracl/nomiracl"):
         """
         Load the NoMIRACL dataset from the given directory.
         Args:
@@ -82,6 +83,9 @@ class NoMIRACLDataLoader(DataLoader):
         self.language = language
         self.split = split
         self.load_from_huggingface = load_from_huggingface
+        self.hf_dataset_name = hf_dataset_name
+        
+        # Initializations of the dataset
         self.corpus = {}
         self.queries = {self.relevant_str: {}, self.non_relevant_str: {}}
         self.qrels = {self.relevant_str: {}, self.non_relevant_str: {}}
@@ -90,30 +94,39 @@ class NoMIRACLDataLoader(DataLoader):
             raise ValueError("Split must be one of dev, or test")
 
         if not load_from_huggingface:
-            corpus_file = os.path.join(data_dir, corpus_file)
+            self._init_path_assignment(corpus_file, data_dir, query_files, qrels_files)
+    
+    def _init_path_assignment(self, corpus_file, data_dir, query_files, qrels_files):
+        corpus_file = os.path.join(data_dir, corpus_file)
             
-            if query_files is None:
-                relevant_query_file = os.path.join(data_dir, "topics", f"{self.split}.{self.relevant_str}.tsv")
-                non_relevant_query_file = os.path.join(data_dir, "topics", f"{self.split}.{self.non_relevant_str}.tsv")
-            else:
-                relevant_query_file = query_files[self.relevant_str]
-                non_relevant_query_file = query_files[self.non_relevant_str]
+        if query_files is None:
+            relevant_query_file = os.path.join(data_dir, "topics", f"{self.split}.{self.relevant_str}.tsv")
+            non_relevant_query_file = os.path.join(data_dir, "topics", f"{self.split}.{self.non_relevant_str}.tsv")
+        else:
+            relevant_query_file = query_files[self.relevant_str]
+            non_relevant_query_file = query_files[self.non_relevant_str]
 
-            if qrels_files is None:
-                relevant_qrels_file = os.path.join(data_dir, "qrels", f"{self.split}.{self.relevant_str}.tsv")
-                non_relevant_qrels_file = os.path.join(data_dir, "qrels", f"{self.split}.{self.non_relevant_str}.tsv")
-            else:
-                relevant_qrels_file = qrels_files[self.relevant_str]
-                non_relevant_qrels_file = qrels_files[self.non_relevant_str]
+        if qrels_files is None:
+            relevant_qrels_file = os.path.join(data_dir, "qrels", f"{self.split}.{self.relevant_str}.tsv")
+            non_relevant_qrels_file = os.path.join(data_dir, "qrels", f"{self.split}.{self.non_relevant_str}.tsv")
+        else:
+            relevant_qrels_file = qrels_files[self.relevant_str]
+            non_relevant_qrels_file = qrels_files[self.non_relevant_str]
 
-            self.corpus_file = corpus_file
-            self.query_files = {self.relevant_str: relevant_query_file, self.non_relevant_str: non_relevant_query_file}
-            self.qrels_files = {self.relevant_str: relevant_qrels_file, self.non_relevant_str: non_relevant_qrels_file}
+        self.corpus_file = corpus_file
+        self.query_files = {self.relevant_str: relevant_query_file, self.non_relevant_str: non_relevant_query_file}
+        self.qrels_files = {self.relevant_str: relevant_qrels_file, self.non_relevant_str: non_relevant_qrels_file}
 
     
-    def load_data_from_huggingface(self, dataset_name: str = "miracl/nomiracl") -> None:
+    def load_data_from_huggingface(self) -> None:
         """
-        Load the NoMIRACL dataset from the huggingface datasets library.
+        Load the NoMIRACL dataset from the huggingface datasets library. 
+        Each dataset in the NoMIRACL dataset contains the following columns:
+        - query_id: The unique identifier of the query.
+        - query: The query text.
+        - positive_passages: The list of positive passages for the query.
+        - negative_passages: The list of negative passages for the query.
+        
         Args:
             dataset_name (str): The name of the dataset to be loaded.
             split (str): The split of the dataset to be used. Default is "test".
@@ -121,11 +134,12 @@ class NoMIRACLDataLoader(DataLoader):
             None
         """
         for subset in [self.relevant_str, self.non_relevant_str]:
-            dataset_hf = datasets.load_dataset(dataset_name, self.language, split=f"{self.split}.{subset}")
+            dataset_hf = datasets.load_dataset(self.hf_dataset_name, self.language, split=f"{self.split}.{subset}")
             for row in dataset_hf:
                 query_id = row["query_id"]
                 self.queries[subset][query_id] = row["query"]
-                
+                if query_id not in self.qrels[subset]: self.qrels[subset][query_id] = {}
+
                 for is_positive, passages in zip([0,1], [row["positive_passages"], row["negative_passages"]]):
                     for passage in passages:
                         idx = passage["docid"]
@@ -147,27 +161,27 @@ class NoMIRACLDataLoader(DataLoader):
         self.check(fIn=self.qrels_files[self.non_relevant_str], ext="tsv")
         
         if not len(self.corpus):
-            logger.info("Loading Corpus...")
+            logger.info("Loading corpus...")
             self.corpus = load_corpus(filepath=self.corpus_file)
-            logger.info("Loaded %d Documents.", len(self.corpus))
+            logger.info("Loaded %d documents.", len(self.corpus))
             logger.info("Doc Example: %s", list(self.corpus.values())[0])
         
         if not len(self.queries[self.relevant_str]):
-            logger.info("Loading Relevant Queries...")
+            logger.info("Loading relevant queries...")
             queries_relevant = load_queries(filepath=self.query_files[self.relevant_str])
         
         if not len(self.qrels[self.relevant_str]):
             qrels_relevant = load_qrels(filepath=self.qrels_files[self.relevant_str])
-            logger.info("Loaded %d Relevant Queries.", len(qrels_relevant))
+            logger.info("Loaded %d relevant queries.", len(qrels_relevant))
             queries_relevant = {query_id: query for query_id, query in queries_relevant.items() if query_id in qrels_relevant}
         
         if not len(self.queries[self.non_relevant_str]):
-            logger.info("Loading Non-relevant Queries...")
+            logger.info("Loading non-relevant queries...")
             queries_non_relevant = load_queries(filepath=self.query_files[self.non_relevant_str])
 
         if not len(self.qrels[self.non_relevant_str]):
             qrels_non_relevant = load_qrels(filepath=self.qrels_files[self.non_relevant_str])
-            logger.info("Loaded %d Non-relevant Queries.", len(qrels_non_relevant))
+            logger.info("Loaded %d non-relevant queries.", len(qrels_non_relevant))
         
         # check if query_ids are present in queries and qrels (both)
         qrels_relevant_check, qrels_non_relevant_check = {}, {}
@@ -191,7 +205,7 @@ class NoMIRACLDataLoader(DataLoader):
         sampled_queries = {self.relevant_str: {}, self.non_relevant_str: {}}
         sampled_qrels = {self.relevant_str: {}, self.non_relevant_str: {}}
         
-        # Load the whole dataset
+        # Load the whole dataset either by downloading or using huggingface
         self.load_data() if not self.load_from_huggingface else self.load_data_from_huggingface()
 
         # For convinience
@@ -216,13 +230,13 @@ class NoMIRACLDataLoader(DataLoader):
             if hyp_relevant_samples > len(relevant_qrels):
                 hyp_relevant_samples = len(relevant_qrels)
                 non_relevant_samples = int(hyp_relevant_samples * (non_relevant_ratio / relevant_ratio))
-                logger.info("Valid Samples reached max limit: %d", hyp_relevant_samples)
+                logger.info("Relevant samples reached max limit: %d", hyp_relevant_samples)
             
             # Check if the samples are greater than the dataset size
             if hyp_non_relevant_samples > len(non_relevant_qrels):
                 hyp_non_relevant_samples = len(non_relevant_qrels)
                 relevant_samples = int(hyp_non_relevant_samples * (relevant_ratio / non_relevant_ratio))
-                logger.info("Inrelevant Samples reached max limit: %d", hyp_non_relevant_samples)
+                logger.info("Non-relevant samples reached max limit: %d", hyp_non_relevant_samples)
 
             if (relevant_samples + hyp_non_relevant_samples) > (hyp_relevant_samples + non_relevant_samples):
                 relevant_samples = relevant_samples
@@ -242,14 +256,14 @@ class NoMIRACLDataLoader(DataLoader):
         random.seed(random_seed)
 
         # Sample the dataset
-        logger.info("Sampling %d Valid Queries...", relevant_samples)
+        logger.info("Sampling %d relevant queries...", relevant_samples)
         sampled_ids = random.sample(list(relevant_qrels.keys()), relevant_samples)
 
         for query_id in sampled_ids:
             sampled_qrels["relevant"][query_id] = relevant_qrels[query_id]
             sampled_queries["relevant"][query_id] = relevant_queries[query_id]
         
-        logger.info("Sampling %d Inrelevant Queries...", non_relevant_samples)
+        logger.info("Sampling %d non-relevant queries...", non_relevant_samples)
         sampled_ids = random.sample(list(non_relevant_qrels.keys()), non_relevant_samples)
         
         for query_id in sampled_ids:

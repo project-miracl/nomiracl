@@ -1,6 +1,6 @@
 # Code modified from https://github.com/McGill-NLP/instruct-qa
 
-from .generator import OPT, Llama, Flan, GPTx, PipelineGenerator, Vicuna, FalconPipelineGenerator, AutoModelGenerator, GPTxAzure, BLOOM, Mistral
+from .generator import Llama, Flan, GPTx, Pipeline, Falcon, HFAutoModelCausalLM, GPTxAzure, BLOOM, Mistral
 
 
 def load_model(model_name, **kwargs):
@@ -17,13 +17,10 @@ def load_model(model_name, **kwargs):
     model_name = model_name.lower()
     
     if "dolly" in model_name or "h2ogpt" in model_name:
-        model_cls = PipelineGenerator
+        model_cls = Pipeline
     
-    elif any(model_type in model_name for model_type in ["alpaca", "llama", "orca"]):
+    elif any(model_type in model_name for model_type in ["vicuna", "alpaca", "llama", "orca"]):
         model_cls = Llama
-    
-    elif "vicuna" in model_name:
-        model_cls = Vicuna
     
     elif "azure" in model_name:
         model_cls = GPTxAzure
@@ -35,16 +32,17 @@ def load_model(model_name, **kwargs):
         model_cls = Flan
     
     elif "falcon" in model_name:
-        model_cls = FalconPipelineGenerator
+        model_cls = Falcon
     
     elif any(model_type in model_name.lower() for model_type in ["mistral", "mixtral"]):
         model_cls = Mistral
     
-    elif any(model_type in model_name.lower() for model_type in ["zephyr"]):
-        model_cls = AutoModelGenerator
+    elif any(model_type in model_name.lower() for model_type in ["zephyr", "gemma"]):
+        model_cls = HFAutoModelCausalLM
     
     elif "bloom" in model_name.lower():
         model_cls = BLOOM
+    
     else:
         raise NotImplementedError(f"Model {model_name} not supported.")
 

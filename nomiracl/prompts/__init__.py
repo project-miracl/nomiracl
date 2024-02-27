@@ -1,1 +1,1 @@
-from .template import PromptTemplate, HAGRIDTemplate
+from .template import PromptTemplate, VanillaTemplate
