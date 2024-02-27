@@ -1,4 +1,4 @@
-# NoMIRACL: A Multilingual dataset for LLM hallucination evaluation in RAGs
+# NoMIRACL: A Multilingual Hallucination Evaluation Dataset for Robust RAGs
 <p align="center">
     <a href="https://github.com/project-miracl/nomiracl">
         <img alt="Stars" src="https://img.shields.io/github/stars/project-miracl/nomiracl.svg?style=flat&logo=github&colorB=blue&label=stars">
@@ -15,7 +15,7 @@
 </p>
 
 <h4 align="center">
-    <a href="./"><img style="float: middle;" width="765" height="570" src="./images/nomiracl-teaser.png" /></a>
+    <a href="./"><img style="float: middle;" width="800" height="570" src="./images/nomiracl-teaser.png" /></a>
     <footer>The image has been generated using miramuseai.net and Adobe Photoshop.</footer>
 </h4>
 
@@ -134,15 +134,15 @@ nomiracl = datasets.load_dataset('miracl/nomiracl', language, split=f'{split}.{s
 | :-----: | :--------: | :--------: |
 | GPT-4 | `gpt-4-azure`| [AzureAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/) |
 | GPT-3.5 | `gpt-3.5-azure`| [AzureAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/) |
-| Mixtral-7x8B | `Mixtral-8x7B-Instruct-v0.1`| [:hugs:](https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1) |
-| Mistral-7B | `Mistral-7B-Instruct-v0.2`| [:hugs:](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2) |
-| Orca-2-13B | `Orca-2-13b`| [:hugs:](https://huggingface.co/microsoft/Orca-2-13b) |
-| Orca-2-7B | `Orca-2-7b`| [:hugs:](https://huggingface.co/microsoft/Orca-2-7b) |
-| Aya-101 | `aya-101`| [:hugs:](https://huggingface.co/CohereForAI/aya-101) |
-| LLAMA-2-70B | `llama-2-70b-chat`| [:hugs:](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf) |
-| LLAMA-2-13B |`llama-2-13b-chat`| [:hugs:](https://huggingface.co/meta-llama/Llama-2-13b-chat-hf) |
-| LLAMA-2-7B | `llama-2-7b-chat`| [:hugs:](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf) |
-| Flan-T5-XXL |`flan-t5-xxl`| [:hugs:](https://huggingface.co/google/flan-t5-xxl) |
+| Mixtral-7x8B | `Mixtral-8x7B-Instruct-v0.1`| :hugs: [model](https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1) |
+| Mistral-7B | `Mistral-7B-Instruct-v0.2`| :hugs: [model](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2) |
+| Orca-2-13B | `Orca-2-13b`| :hugs: [model](https://huggingface.co/microsoft/Orca-2-13b) |
+| Orca-2-7B | `Orca-2-7b`| :hugs: [model](https://huggingface.co/microsoft/Orca-2-7b) |
+| Aya-101 | `aya-101`| :hugs: [model](https://huggingface.co/CohereForAI/aya-101) |
+| LLAMA-2-70B | `llama-2-70b-chat`| :hugs: [model](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf) |
+| LLAMA-2-13B |`llama-2-13b-chat`| :hugs: [model](https://huggingface.co/meta-llama/Llama-2-13b-chat-hf) |
+| LLAMA-2-7B | `llama-2-7b-chat`| :hugs: [model](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf) |
+| Flan-T5-XXL |`flan-t5-xxl`| :hugs: [model](https://huggingface.co/google/flan-t5-xxl) |
 
 ### Baseline Accuracy on NoMIRACL non-relevant subset (test split, maximum cap of 250 per language)
 
@@ -243,16 +243,24 @@ NoMIRACL is a multilingual dataset designed to evaluate LLM robustness against e
 - Queries with known answers.
 - At least one of the top-k passages manually judged as relevant (relevancy score = 1).
 
-## Evaluation Metrics (TBA)
+## Evaluation Metrics
 
-<img src="./images/NoMIRACL-Contigency-Table.drawio.png" width="411" height="193" />
+<img src="./images/NoMIRACL-confusion-matrix.png" width="411" height="193"/>
 
 We conduct a robustness evaluation using a binary classification task, comparing LLM predictions against the ground truth provided in NoMIRACL. The metrics used are hallucination rate and error rate.
 
-- **Hallucination Rate:** Measures the model's tendency to hallucinate an answer when no answer is present in the non-relevant subset.
+- **Hallucination Rate:** `FP/(FP + TN)` Measures the model's tendency to hallucinate an answer when no answer is present in the non-relevant subset.
 
-- **Error Rate:** Measures the model's inaccuracy in recognizing relevant passages in the relevant subset.
+- **Error Rate:** `FN/(FN + TP)` Measures the model's inaccuracy in recognizing relevant passages in the relevant subset.
 
 ---
+### Collaboration
 
-**Note:** This README provides an overview of the NoMIRACL project. For detailed information, instructions, and updates, refer to the official [paper](https://arxiv.org/abs/2312.11361).
+The NoMIRACL dataset has been made possible due to a collaborative effort of the following universities and organizations:
+
+- University of Waterloo
+- Huawei Noah's Ark Lab
+
+Contact person: Nandan Thakur, [nandan.thakur@uwaterloo.co](mailto:nandan.thakur@uwaterloo.ca)
+
+>> This repository contains experimental software and is published for the sole purpose of giving additional background details on the respective publication.
