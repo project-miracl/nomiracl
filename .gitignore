@@ -1,3 +1,7 @@
+## Custom
+/results/eval/
+/results/baselines-new/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
