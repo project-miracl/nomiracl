@@ -12,8 +12,8 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     license="Apache License 2.0",
-    url='',
-    download_url="",
+    url='https://github.com/project-miracl/nomiracl',
+    download_url="https://github.com/project-miracl/nomiracl/archive/v0.0.1.zip",
     packages=find_packages(),
     python_requires='>=3.8',
     classifiers=[
