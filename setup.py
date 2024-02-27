@@ -28,6 +28,7 @@ setup(
         "openai",
         "tiktoken",
         "bitsandbytes",
+        "datasets"
     ],
     keywords="Transformer Networks BERT PyTorch NLP deep learning LLM Hallucination"
 )
