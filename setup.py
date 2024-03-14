@@ -5,7 +5,7 @@ with open("README.md", mode="r", encoding="utf-8") as readme_file:
 
 setup(
     name='nomiracl',
-    version='0.0.1',
+    version='0.0.2',
     author="Nandan Thakur",
     author_email="nandant@gmail.com",
     description='Unanswerable questions for LLM hallucations',
@@ -13,7 +13,7 @@ setup(
     long_description_content_type="text/markdown",
     license="Apache License 2.0",
     url='https://github.com/project-miracl/nomiracl',
-    download_url="https://github.com/project-miracl/nomiracl/archive/v0.0.1.zip",
+    download_url="https://github.com/project-miracl/nomiracl/archive/v0.0.2.zip",
     packages=find_packages(),
     python_requires='>=3.8',
     classifiers=[
@@ -28,7 +28,8 @@ setup(
         "openai",
         "tiktoken",
         "bitsandbytes",
-        "datasets"
+        "datasets",
+        "accelerate"
     ],
     keywords="Transformer Networks BERT PyTorch NLP deep learning LLM Hallucination"
 )
