@@ -1,12 +1,17 @@
-from .generator import (
+from .huggingface import (
     Llama,
     Flan,
-    GPTx,
     Pipeline,
     Falcon,
     HFAutoModelCausalLM,
-    GPTxAzure,
     BLOOM,
-    Mistral,
+    Mistral
 )
+
+from .cohere import Cohere
+from .openai import OpenAIxNvidia
+from .azure import GPTxAzure
+from .anyscale import AnyScale
+from .vllm import VLLM
+
 from .utils import load_model

@@ -1,25 +1,12 @@
 # Initial code structure taken from https://github.com/McGill-NLP/instruct-qa.
 
-from math import inf
+from nomiracl.generation.base import BaseGenerator
 from typing import List
-import time, os
-import tiktoken
-import openai
-from openai import (
-    RateLimitError,
-    APIConnectionError,
-    InternalServerError,
-    NotFoundError,
-    PermissionDeniedError,
-    AuthenticationError,
-    Timeout,
-)
 
 import torch
-import requests
 import logging
 from transformers import pipeline
-from tqdm.autonotebook import tqdm
+from peft import AutoPeftModelForCausalLM
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
@@ -29,254 +16,6 @@ from transformers import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-class BaseGenerator:
-    def __init__(
-        self,
-        model_name=None,
-        weights_path=None,
-        api_key=None,
-        cache_dir=None,
-        torch_dtype=torch.float16,
-        temperature=0.95,
-        top_p=0.95,
-        num_return_sequences=1,
-        max_new_tokens=200,
-        min_new_tokens=1,
-        max_length=4096,
-        skip_special_tokens=True,
-        clean_up_tokenization_spaces=False,
-        device="cuda",
-        load_in_8bit=False,
-        load_in_4bit=False,
-        device_map="auto",
-    ):
-        self.model_name = model_name
-        self.tokenizer = None
-        self.weights_path = weights_path
-        self.api_key = api_key
-        self.cache_dir = cache_dir
-        self.torch_dtype = torch_dtype
-        self.temperature = temperature
-        self.top_p = top_p
-        self.max_new_tokens = max_new_tokens
-        self.min_new_tokens = min_new_tokens
-        self.skip_special_tokens = skip_special_tokens
-        self.clean_up_tokenization_spaces = clean_up_tokenization_spaces
-        self.device = device
-        self.wait = 10
-        self.load_in_8bit = load_in_8bit
-        self.load_in_4bit = load_in_4bit
-        self.device_map = device_map
-        self.max_length = max_length
-        self.num_return_sequences = num_return_sequences
-
-    def __call__(self, prompt, **kwargs):
-        raise NotImplementedError()
-
-    def post_process_response(self, response):
-        return response
-
-    def batch_call(self, prompts, batch_size=1, **kwargs):
-        batches = [
-            prompts[i : i + batch_size] for i in range(0, len(prompts), batch_size)
-        ]
-
-        results = []
-        for i, batch in enumerate(
-            tqdm(batches, desc="Collecting responses", leave=False)
-        ):
-            responses = self.__call__(batch, **kwargs)
-            results.extend(responses)
-
-        return results
-
-    def truncate_response(self, response, max_length=500):
-        if self.tokenizer is None:
-            return response
-        tokens = self.tokenizer.tokenize(
-            response, max_length=max_length, truncation=True
-        )
-        return self.tokenizer.convert_tokens_to_string(tokens)
-
-
-#################################
-# Azure GPT-3.5/GPT-4 Generator #
-#################################
-class GPTxAzure(BaseGenerator):
-    """OpenAI GPT-3.5-turbo and GPT-4 models on Azure."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # API: <AZURE_OPENAI_API_BASE>openai/deployments/<AZURE_DEPLOYMENT_NAME>/<model_map[model_name]>/completions?api-version=<AZURE_OPENAI_API_VERSION>
-        # where model_map = {"gpt-3.5-turbo": "chat", "gpt-4": "chat"}
-        AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION")
-        AZURE_OPENAI_API_BASE = os.getenv("AZURE_OPENAI_API_BASE")
-        AZURE_DEPLOYMENT_NAME = os.getenv("AZURE_DEPLOYMENT_NAME")
-
-        self.model_name = self.model_name.replace("-azure", "")
-        self.model_map = {
-            "gpt-3.5-turbo": "chat",
-            "gpt-4": "chat",
-        }
-
-        assert (
-            self.model_name in self.model_map
-        ), "You should add the model name to the model -> endpoint compatibility mappings."
-        assert self.model_map[self.model_name] in [
-            "chat",
-            "completions",
-        ], "Only chat and completions endpoints are implemented. You may want to add other configurations."
-
-        # json error happens if max_new_tokens is inf
-        map_name = self.model_map[self.model_name]
-        self.api_url = f"{AZURE_OPENAI_API_BASE}openai/deployments/{AZURE_DEPLOYMENT_NAME}/{map_name}/completions?api-version={AZURE_OPENAI_API_VERSION}"
-        self.max_new_tokens = self.max_new_tokens
-
-    def __call__(self, prompts, n=1):
-        responses = []
-        for prompt in prompts:
-            headers = {"Content-Type": "application/json", "api-key": self.api_key}
-
-            response = self.api_request(
-                prompt=prompt,
-                headers=headers,
-                n=n,
-            )
-            if n == 1:
-                responses.append(response[0])
-            else:
-                responses.append(response)
-        return responses
-
-    def api_request(self, prompt, headers, n):
-        try:
-            if self.model_map[self.model_name] == "chat":
-                res = requests.post(
-                    url=self.api_url,
-                    headers=headers,
-                    json={
-                        "messages": [{"role": "user", "content": prompt}],
-                        "max_tokens": self.max_new_tokens,
-                        "temperature": self.temperature,
-                        "top_p": self.top_p,
-                        "n": n,
-                    },
-                )
-                if "choices" not in res.json():
-
-                    if "code" in res.json()["error"]:
-                        if res.json()["error"]["code"] == "429":
-                            logger.error(
-                                f"Error: {res.json()}. Waiting {self.wait} seconds before retrying."
-                            )
-                            time.sleep(self.wait)
-                            return self.api_request(prompt, headers, n)
-                        else:
-                            logger.error(f"Error: {res.json()}. Do not retry!")
-                            return ["Unable to generate response."]
-                else:
-                    return [r["message"]["content"] for r in res.json()["choices"]]
-        except (
-            requests.exceptions.HTTPError,
-            requests.exceptions.ConnectionError,
-            requests.exceptions.Timeout,
-            requests.exceptions.RequestException,
-        ) as e:
-            logger.error(f"Error: {e}. Waiting {self.wait} seconds before retrying.")
-            time.sleep(self.wait)
-            return self.api_request(prompt, headers, n)
-
-    def truncate_response(self, response, max_length=500):
-        encoder = tiktoken.encoding_for_model(self.model_name)
-        input_tokens = encoder.encode(response)
-        if len(input_tokens) <= max_length:
-            return response
-        else:
-            return encoder.decode(input_tokens[:max_length])
-
-
-##################################
-# OpenAI GPT-3.5/GPT-4 Generator #
-##################################
-class GPTx(BaseGenerator):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-        openai.api_key = OPENAI_API_KEY
-        try:
-            OPENAI_ORGANIZATION = os.getenv("OPENAI_ORGANIZATION")
-            openai.organization = OPENAI_ORGANIZATION
-        except:
-            pass
-
-        self.model_map = {
-            "gpt-3.5-turbo": "chat",
-            "gpt-4": "chat",
-        }
-        assert (
-            self.model_name in self.model_map
-        ), "You should add the model name to the model -> endpoint compatibility mappings."
-        assert self.model_map[self.model_name] in [
-            "chat",
-            "completions",
-        ], "Only chat and completions endpoints are implemented. You may want to add other configurations."
-        # json error happens if max_new_tokens is inf
-        self.max_new_tokens = self.max_new_tokens
-
-    def __call__(self, prompts, n=1):
-        responses = []
-        for prompt in prompts:
-            kwargs = {"temperature": self.temperature, "top_p": self.top_p, "n": n}
-            if self.max_new_tokens != inf:
-                kwargs["max_tokens"] = self.max_new_tokens
-            response = self.api_request(
-                prompt,
-                **kwargs,
-            )
-            if n == 1:
-                responses.append(response[0])
-            else:
-                responses.append(response)
-        return responses
-
-    def api_request(self, prompt, **kwargs):
-        try:
-            if self.model_map[self.model_name] == "chat":
-                res = openai.ChatCompletion.create(
-                    model=self.model_name,
-                    messages=[{"role": "user", "content": prompt}],
-                    **kwargs,
-                )
-                return [r.message.content for r in res.choices]
-            elif self.model_map[self.model_name] == "completions":
-                res = openai.Completion.create(
-                    model=self.model_name, prompt=prompt, **kwargs
-                )
-                return [r.text for r in res.choices]
-        except (
-            RateLimitError,
-            APIConnectionError,
-            InternalServerError,
-            NotFoundError,
-            PermissionDeniedError,
-            AuthenticationError,
-            Timeout,
-        ) as e:
-            logger.error(f"Error: {e}. Waiting {self.wait} seconds before retrying.")
-            time.sleep(self.wait)
-            return self.api_request(prompt, **kwargs)
-
-    def truncate_response(self, response: str, max_length: int = 500) -> str:
-        encoder = tiktoken.encoding_for_model(self.model_name)
-        input_tokens = encoder.encode(response)
-        if len(input_tokens) <= max_length:
-            return response
-        else:
-            return encoder.decode(input_tokens[:max_length])
-
 
 ######################################
 # HuggingFace LLAMA Series Generator #
@@ -289,41 +28,72 @@ class Llama(BaseGenerator):
         assert (
             self.weights_path is not None
         ), "A path to model weights must be defined for using this generator."
+        
+        # LLAMA models are left-padded
+        logger.info("Loading LLAMA model with left padding.")
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.weights_path, padding_side="left"
         )
 
-        quantization_config = BitsAndBytesConfig(
-            load_in_8bit=self.load_in_8bit,
-            load_in_4bit=self.load_in_4bit,
-            bnb_8bit_quant_type="nf4",
-            bnb_4bit_quant_type="nf4",
-            bnb_4bit_compute_dtype=self.torch_dtype,
-            bnb_8bit_compute_dtype=self.torch_dtype,
-        )
+        ## exception for LLAMA-3
+        if "llama-3" in self.weights_path.lower():
+            self.terminators = [
+                self.tokenizer.eos_token_id,
+                self.tokenizer.convert_tokens_to_ids("<|eot_id|>")
+            ]
+        
+        # check if the model is a PEFT model
+        if self.peft:
+            self.model = AutoPeftModelForCausalLM.from_pretrained(
+                self.weights_path,
+                torch_dtype=self.torch_dtype,
+                device_map=self.device_map,
+                cache_dir=self.cache_dir,
+                trust_remote_code=True,
+            )
+            self.model.eval()
+        
+        else:
 
-        self.model = AutoModelForCausalLM.from_pretrained(
-            self.weights_path,
-            torch_dtype=self.torch_dtype,
-            device_map=self.device_map,
-            cache_dir=self.cache_dir,
-            trust_remote_code=True,
-            quantization_config=quantization_config,
-        )
+            quantization_config = BitsAndBytesConfig(
+                load_in_8bit=self.load_in_8bit,
+                load_in_4bit=self.load_in_4bit,
+                bnb_8bit_quant_type="nf4",
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_compute_dtype=self.torch_dtype,
+                bnb_8bit_compute_dtype=self.torch_dtype,
+            )
 
-        if not self.load_in_8bit and not self.load_in_4bit:
-            self.model = self.model.bfloat16()
+            self.model = AutoModelForCausalLM.from_pretrained(
+                self.weights_path,
+                torch_dtype=self.torch_dtype,
+                device_map=self.device_map,
+                cache_dir=self.cache_dir,
+                trust_remote_code=True,
+                quantization_config=quantization_config,
+            )
 
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.pad_token = self.tokenizer.eos_token
-            self.model.config.pad_token_id = self.model.config.eos_token_id
+            if not self.load_in_8bit and not self.load_in_4bit:
+                self.model = self.model.bfloat16()
+
+            if self.tokenizer.pad_token is None:
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+                self.model.config.pad_token_id = self.model.config.eos_token_id
 
     def __call__(self, prompts: List[str]) -> List[str]:
 
+        final_prompts = []
+
+        # Apply chat template to the prompts
+        for prompt in prompts:
+            messages = [{"role": "user", "content": prompt}]
+            prompt = self.tokenizer.apply_chat_template(messages, tokenize=False)
+            final_prompts.append(prompt)
+
         _input = self.tokenizer(
-            prompts,
+            final_prompts,
             return_tensors="pt",
-            padding="max_length",
+            padding=True,
             max_length=self.max_length,
             truncation=True,
         ).to(self.device)
@@ -335,6 +105,7 @@ class Llama(BaseGenerator):
             top_p=self.top_p,
             max_new_tokens=self.max_new_tokens,
             min_new_tokens=self.min_new_tokens,
+            eos_token_id=self.terminators if "llama-3" in self.weights_path.lower() else None
         )
 
         return [
