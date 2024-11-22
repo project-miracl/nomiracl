@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nomiracl"
+version = "0.0.2"
+description = "Unanswerable questions for LLM hallucations"
+readme = "README.md"
+readme-content-type = "text/markdown"
+license = {text = "Apache License 2.0"}
+authors = [
+    {name = "Nandan Thakur", email = "nandant@gmail.com"}
+]
+homepage = "https://github.com/project-miracl/nomiracl"
+download-url = "https://github.com/project-miracl/nomiracl/archive/v0.0.2.zip"
+requires-python = ">=3.8"
+keywords = [
+    "Transformer Networks", 
+    "PyTorch", 
+    "NLP", 
+    "deep learning", 
+    "LLM", 
+    "Hallucination"
+    "Relevance"
+    "Multilingual"
+]
+
+[project.urls]
+Repository = "https://github.com/project-miracl/nomiracl"
+
+[project.classifiers]
+intended-audience = ["Science/Research"]
+license = ["OSI Approved :: MIT License"]
+programming-language = ["Python :: 3.6"]
+topic = ["Scientific/Engineering :: Artificial Intelligence"]
+
+[project.dependencies]
+torch = "*"
+transformers = "*"
+openai = "*"
+tiktoken = "*"
+bitsandbytes = "*"
+datasets = "*"
+accelerate = "*"
+
+[tool.setuptools.packages.find]
+where = ["."]
