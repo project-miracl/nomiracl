@@ -9,6 +9,7 @@ KEY_TEMPLATE = {
     "repeat": RepeatTemplate,
 }
 
+
 def load_prompt_template(template_name, **kwargs):
     """
     Loads prompts by template_name.
@@ -21,13 +22,13 @@ def load_prompt_template(template_name, **kwargs):
         PromptTemplate: Prompt template object.
     """
     template_cls = None
-    
+
     template_name = template_name.lower()
     for template in KEY_TEMPLATE:
         if template in template_name:
             template_cls = KEY_TEMPLATE[template]
             break
-    
+
     if not template_cls:
         raise NotImplementedError(f"Template {template_name} not supported.")
 

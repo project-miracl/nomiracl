@@ -1,1 +1,7 @@
-from .template import PromptTemplate, VanillaTemplate, RoleTemplate, ExplanationTemplate, RepeatTemplate
+from .template import (
+    PromptTemplate,
+    VanillaTemplate,
+    RoleTemplate,
+    ExplanationTemplate,
+    RepeatTemplate,
+)
