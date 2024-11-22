@@ -1,16 +1,7 @@
+from nomiracl.util import count_word
 from typing import List, Dict
 import re
 
-def count_word(sentence, word):
-    # Split the sentence into words
-    words = sentence.split()
-    # Initialize a counter
-    count = 0
-    # Loop through the words and count occurrences of the specific word
-    for w in words:
-        if w == word:
-            count += 1
-    return count
 
 class PromptTemplate:
     """
@@ -99,3 +90,33 @@ class VanillaTemplate(PromptTemplate):
                 return self.answer
             else:   
                 return self.invalid_answer
+
+# Ablations of the Vanilla Template
+class RoleTemplate(VanillaTemplate):
+    def __init__(self, count: int = 10):
+        super().__init__(count)
+        self.template = ("You are an evaluator checking whether the question contains the answer within the contexts or not. I will give you a question and several contexts containing information about the question." +
+        f" Read the contexts carefully. If any of the contexts answers the question, respond as either \"{self.answer}\" or \"{self.no_answer}\". Do not add any other information in your output." +
+        "\n\nQUESTION:\n{query}\n\n" + "CONTEXTS:\n" + 
+        "\n\n".join(["[{}] {}".format(i, "{" + passage + "}") for i, passage in enumerate(self.passage_variables, 1)]) + 
+        "\n\nOUTPUT:\n")
+
+class RepeatTemplate(VanillaTemplate):
+    def __init__(self, count: int = 10):
+        super().__init__(count)
+        self.template = ("I will give you a question and several contexts containing information about the question." +
+        f" Read the contexts carefully. If any of the contexts answers the question, respond as either \"{self.answer}\" or \"{self.no_answer}\"." +
+        "\n\nQUESTION:\n{query}\n\n" + "CONTEXTS:\n" + 
+        "\n\n".join(["[{}] {}".format(i, "{" + passage + "}") for i, passage in enumerate(self.passage_variables, 1)]) + 
+        "\n\nRemember to read the contexts carefully. If any of the contexts answers the question: {query}, "
+        f"respond as either \"{self.answer}\" or \"{self.no_answer}\"." +
+        "\n\nOUTPUT:\n")
+
+class ExplanationTemplate(VanillaTemplate):
+    def __init__(self, count: int = 10):
+        super().__init__(count)
+        self.template = ("I will give you a question and several contexts containing information about the question." +
+        f" Read the contexts carefully and provide a step-by-step explanation for your answer. If any of the contexts answers the question, respond as either \"{self.answer}\" or \"{self.no_answer}\"." +  
+        f" You must follow the output format with: ## Explanation:... ## Answer: \"{self.answer}\" OR \"{self.no_answer}\"" +
+        "\n\nQUESTION:\n{query}\n\n" + "CONTEXTS:\n" + 
+        "\n\n".join(["[{}] {}".format(i, "{" + passage + "}") for i, passage in enumerate(self.passage_variables, 1)]) + "\n\n")

@@ -6,6 +6,17 @@ import json
 import shutil
 import requests
 
+def count_word(sentence: str, word: str) -> int:
+    # Split the sentence into words
+    words = sentence.split()
+    # Initialize a counter
+    count = 0
+    # Loop through the words and count occurrences of the specific word
+    for w in words:
+        if w == word:
+            count += 1
+    return count
+
 def unzip_folder(folder_name):
     print("Unzipping " + folder_name)
     shutil.unpack_archive(folder_name + '.zip', folder_name)
