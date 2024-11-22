@@ -50,7 +50,7 @@ $ pip install -e .
 ```python
 from nomiracl.dataset import NoMIRACLDataLoader
 
-data_loader = NoMIRACLDataLoader(language = "english, 
+data_loader = NoMIRACLDataLoader(language = "english", 
                                  split = "test", # or 'dev' 
                                  hf_dataset_name="miracl/nomiracl", 
                                  load_from_huggingface=True)
