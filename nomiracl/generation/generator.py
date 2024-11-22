@@ -289,7 +289,11 @@ class Llama(BaseGenerator):
         )
 
         quantization_config = BitsAndBytesConfig(
-            load_in_8bit=self.load_in_8bit, load_in_4bit=self.load_in_4bit)
+            load_in_8bit=self.load_in_8bit, load_in_4bit=self.load_in_4bit,
+            bnb_8bit_quant_type="nf4", 
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=self.torch_dtype, 
+            bnb_8bit_compute_dtype=self.torch_dtype)
         
         self.model = AutoModelForCausalLM.from_pretrained(
             self.weights_path, 
@@ -524,7 +528,11 @@ class Mistral(BaseGenerator):
             self.weights_path, trust_remote_code=True
         )
         quantization_config = BitsAndBytesConfig(
-            load_in_8bit=self.load_in_8bit, load_in_4bit=self.load_in_4bit)
+            load_in_8bit=self.load_in_8bit, load_in_4bit=self.load_in_4bit,
+            bnb_8bit_quant_type="nf4", 
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=self.torch_dtype, 
+            bnb_8bit_compute_dtype=self.torch_dtype)
 
         self.model = AutoModelForCausalLM.from_pretrained(
             self.weights_path, 
@@ -596,7 +604,11 @@ class HFAutoModelCausalLM(BaseGenerator):
         )
 
         quantization_config = BitsAndBytesConfig(
-            load_in_8bit=self.load_in_8bit, load_in_4bit=self.load_in_4bit)
+            load_in_8bit=self.load_in_8bit, load_in_4bit=self.load_in_4bit,
+            bnb_8bit_quant_type="nf4", 
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=self.torch_dtype, 
+            bnb_8bit_compute_dtype=self.torch_dtype)
 
         self.model = AutoModelForCausalLM.from_pretrained(
             self.weights_path, 
