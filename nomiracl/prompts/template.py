@@ -35,12 +35,12 @@ class VanillaTemplate(PromptTemplate):
         self.no_answer = "I don't know"
         self.answer = "Yes, answer is present"
         self.invalid_answer = "Invalid"
-        passage_variables = [f"passage_{i}" for i in range(1, self.max_count + 1)]
-        self.variables = ["query"] + passage_variables
+        self.passage_variables = [f"passage_{i}" for i in range(1, self.max_count + 1)]
+        self.variables = ["query"] + self.passage_variables
         self.template = ("I will give you a question and several contexts containing information about the question." +
         f" Read the contexts carefully. If any of the contexts answers the question, respond as either \"{self.answer}\" or \"{self.no_answer}\"." +
         "\n\nQUESTION:\n{query}\n\n" + "CONTEXTS:\n" + 
-        "\n\n".join(["[{}] {}".format(i, "{" + passage + "}") for i, passage in enumerate(passage_variables, 1)]) + 
+        "\n\n".join(["[{}] {}".format(i, "{" + passage + "}") for i, passage in enumerate(self.passage_variables, 1)]) + 
         "\n\nOUTPUT:\n")
 
     def __call__(self, query: str, passages: List[str]) -> str:
