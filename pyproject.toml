@@ -42,7 +42,8 @@ dependencies = [
     "tiktoken",
     "bitsandbytes",
     "datasets",
-    "accelerate"
+    "accelerate",
+    "vllm",
 ]
 
 [project.urls]

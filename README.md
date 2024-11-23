@@ -64,9 +64,24 @@ corpus, queries, qrels = data_loader.load_data_sample(
 ```python
 from nomiracl.generation.utils import load_model
 
-model_name = "zephyr-7b-beta"
-weights_path = f"HuggingFaceH4/{model_name}"
-model = load_model(model_name, weights_path=weights_path, cache_dir=None)
+model_name = "meta-llama/Meta-Llama-3-8B-Instruct"
+
+# List of techniques supported in nomiracl: 
+# huggingface (GPUs), vllm (GPUs), cohere (API), openai (API), nvidia (API), azure (API), anyscale (API)
+# `cohere` requires COHERE_API_KEY, `openai` requires OPENAI_API_KEY, `nvidia` requires NVIDIA_API_KEY
+# `azure` requires AZURE_OPENAI_API_BASE, AZURE_OPENAI_API_VERSION and AZURE_OPENAI_API_KEY
+# `anyscale` requires ANYSCALE_BASE_URL and ANYSCALE_API_KEY.
+
+technique = "vllm" # or huggingface or nvidia, anyscale etc.
+
+model = load_model(
+    technique, # technique
+    model_name, # model_name
+    cache_dir="<your-cache-dir>", # extra kwargs
+    batch_size=2, # extra kwargs
+    num_gpus=1, # extra kwargs
+    concurrency=2 # extra kwargs
+)
 
 # Sample prompts
 prompts = [
@@ -75,20 +90,21 @@ prompts = [
     "What is the capital of Italy?",
 ]
 
-model_results = model.batch_call(prompts, batch_size=1)
+model_results = model.call(prompts)
 
 for prompt, result in zip(prompts, model_results):
     print("Prompt: {}".format(prompt))
     print("{} result: {}".format(model_name, result))
 ```
 
-#### 3. Loading Vanilla prompt template
+#### 3. Loading our paper used prompt templates
 - Full example available in [sample_vanilla_prompt_exploration.py](./examples/sample_vanilla_prompt_exploration.py).
 
 ```python
 from nomiracl.prompts.utils import load_prompt_template
 
-prompt_cls = load_prompt_template("vanilla", count = 10)
+# Options include: vanilla, role, repeat, explanation 
+prompt_cls = load_prompt_template("vanilla", count = 10) # as we include 10 passages
 
 query = "Which is the best programming language?"
 
@@ -106,7 +122,28 @@ passages = [
 ]
 
 prompt = prompt_cls(query=query, passages=passages)
-print(prompt)
+```
+
+Or you can provide your **own** custom prompt template by modifying the `self.template` in `nomiracl.VanillaTemplate`.
+
+```python
+from nomiracl.prompts import VanillaTemplate
+
+class CustomTemplate(VanillaTemplate):
+    def __init__(self, count: int = 1):
+        super().__init__(count)
+        self.template = (
+            "This is a pairwise prompt template. Respond as either "{self.answer}" or "{self.no_answer}".'
+            + "\n\nQUESTION:\n{query}\n\n"
+            + "CONTEXT:\n"
+            + "\n\n".join(
+                [
+                    "[{}] {}".format(i, "{" + passage + "}")
+                    for i, passage in enumerate(self.passage_variables, 1)
+                ]
+            )
+            + "\n\nOUTPUT:\n"
+        )
 ```
 
 ## :hugs: NoMIRACL Dataset
