@@ -1,6 +1,13 @@
 # Code modified from https://github.com/McGill-NLP/instruct-qa.
 
-from .template import VanillaTemplate
+from .template import VanillaTemplate, RoleTemplate, ExplanationTemplate, RepeatTemplate
+
+KEY_TEMPLATE = {
+    "vanilla": VanillaTemplate,
+    "role": RoleTemplate,
+    "explanation": ExplanationTemplate,
+    "repeat": RepeatTemplate,
+}
 
 
 def load_prompt_template(template_name, **kwargs):
@@ -14,9 +21,15 @@ def load_prompt_template(template_name, **kwargs):
     Returns:
         PromptTemplate: Prompt template object.
     """
-    if "vanilla" in template_name:
-        template_cls = VanillaTemplate
-    else:
+    template_cls = None
+
+    template_name = template_name.lower()
+    for template in KEY_TEMPLATE:
+        if template in template_name:
+            template_cls = KEY_TEMPLATE[template]
+            break
+
+    if not template_cls:
         raise NotImplementedError(f"Template {template_name} not supported.")
 
     return template_cls(**kwargs)

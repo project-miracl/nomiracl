@@ -1,49 +1,62 @@
 # Code modified from https://github.com/McGill-NLP/instruct-qa
 
-from .generator import Llama, Flan, GPTx, Pipeline, Falcon, HFAutoModelCausalLM, GPTxAzure, BLOOM, Mistral
+from .huggingface import (
+    Llama,
+    Flan,
+    Pipeline,
+    Falcon,
+    HFAutoModelCausalLM,
+    BLOOM,
+    Mistral,
+)
+from .cohere import Cohere
+from .openai import OpenAIxNvidia
+from .azure import GPTxAzure
+from .anyscale import AnyScale
+from .vllm import VLLM
 
+RUNTYPES = {
+    "huggingface": [Llama, Flan, Pipeline, Falcon, HFAutoModelCausalLM, BLOOM, Mistral],
+    "cohere": [Cohere],
+    "openai": [OpenAIxNvidia],
+    "nvidia": [OpenAIxNvidia],
+    "azure": [GPTxAzure],
+    "anyscale": [AnyScale],
+    "vllm": [VLLM],
+}
 
-def load_model(model_name, **kwargs):
+def load_model(run_type: str, model_name: str, **kwargs):
     """
     Loads model by model_name available in Huggingface.
 
     Args:
+        run_type (str): Type of model to load.
         model_name (str): Name of model to load.
         kwargs: Additional parameters for the generator (e.g., temperature).
 
     Returns:
         BaseGenerator: Generator object.
     """
-    model_name = model_name.lower()
+    run_type, model_name = run_type.lower(), model_name.lower()
+
+    if run_type not in RUNTYPES:
+        raise NotImplementedError(f"Run type {run_type} not supported. Choose from {list(RUNTYPES.keys())}.")
     
-    if "dolly" in model_name or "h2ogpt" in model_name:
-        model_cls = Pipeline
+    model_cls = None
+
+    ### Huggingface models
+    if run_type == "huggingface":
+        if "dolly" in model_name or "h2ogpt" in model_name: model_cls = Pipeline
+        elif any(model_type in model_name for model_type in ["vicuna", "alpaca", "llama", "orca"]): model_cls = Llama
+        elif any(model_type in model_name for model_type in ["mistral", "mixtral"]): model_cls = Mistral
+        elif any(model_type in model_name for model_type in ["flan", "aya"]): model_cls = Flan
+        elif any(model_type in model_name for model_type in ["zephyr", "gemma"]): model_cls = HFAutoModelCausalLM
+        elif "falcon" in model_name: model_cls = Falcon
+        elif "bloom" in model_name: model_cls = BLOOM
+        else: raise NotImplementedError(f"Model {model_name} not supported.")
     
-    elif any(model_type in model_name for model_type in ["vicuna", "alpaca", "llama", "orca"]):
-        model_cls = Llama
-    
-    elif "azure" in model_name:
-        model_cls = GPTxAzure
-    
-    elif "davinci" in model_name or "gpt" in model_name:
-        model_cls = GPTx
-    
-    elif any(model_type in model_name.lower() for model_type in ["flan", "aya"]):
-        model_cls = Flan
-    
-    elif "falcon" in model_name:
-        model_cls = Falcon
-    
-    elif any(model_type in model_name.lower() for model_type in ["mistral", "mixtral"]):
-        model_cls = Mistral
-    
-    elif any(model_type in model_name.lower() for model_type in ["zephyr", "gemma"]):
-        model_cls = HFAutoModelCausalLM
-    
-    elif "bloom" in model_name.lower():
-        model_cls = BLOOM
-    
+    ### Rest of the models
     else:
-        raise NotImplementedError(f"Model {model_name} not supported.")
+        model_cls = RUNTYPES[run_type][0]
 
     return model_cls(model_name, **kwargs)

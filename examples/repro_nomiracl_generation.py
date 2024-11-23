@@ -36,6 +36,7 @@ do
 done done
 
 """
+
 from nomiracl.dataset import NoMIRACLDataLoader
 from nomiracl import util, LoggingHandler
 from nomiracl.generation.utils import load_model
@@ -47,13 +48,15 @@ import os
 import logging
 
 #### Just some code to print debug information to stdout
-logging.basicConfig(format='%(asctime)s - %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S',
-                    level=logging.INFO,
-                    handlers=[LoggingHandler()])
+logging.basicConfig(
+    format="%(asctime)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    level=logging.INFO,
+    handlers=[LoggingHandler()],
+)
 
-if __name__ == '__main__':
-    
+if __name__ == "__main__":
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--language", default=None)
     parser.add_argument("--prompt_template", default=None)
@@ -86,25 +89,46 @@ if __name__ == '__main__':
 
     model_name = args.model_name
     logging.info("Loading model: {}...".format(model_name))
-    
+
     # Load model from HuggingFace, provide the complete name under the weights path of the model
-    models_supported = ["vicuna", "llama", "olmo", "mistral", "mixtral", "orca", "phi", "zephyr", "bloom", "flan", "aya", "gemma"]
+    models_supported = [
+        "vicuna",
+        "llama",
+        "olmo",
+        "mistral",
+        "mixtral",
+        "orca",
+        "phi",
+        "zephyr",
+        "bloom",
+        "flan",
+        "aya",
+        "gemma",
+    ]
 
     if any(model_type in model_name.lower() for model_type in models_supported):
-        if "llama" in model_name: weights_path = f"meta-llama/{model_name.capitalize()}-hf"
-        elif "vicuna" in model_name: weights_path = f"lmsys/{model_name}"
-        elif "mixtral" in model_name.lower() or "mistral" in model_name.lower(): weights_path = f"mistralai/{model_name}"
-        elif "orca" in model_name.lower() or "phi" in model_name.lower(): weights_path = f"microsoft/{model_name}"
-        elif "zephyr" in model_name.lower(): weights_path = f"HuggingFaceH4/{model_name}"
-        elif "bloom" in model_name.lower(): weights_path = f"bigscience/{model_name}"
-        elif "flan" in model_name.lower(): weights_path = f"google/{model_name}"
-        elif "aya" in model_name.lower(): weights_path = f"CohereforAI/{model_name}"
-        elif "gemma" in model_name.lower(): weights_path = f"google/{model_name}"
-    
-    
+        if "llama" in model_name:
+            weights_path = f"meta-llama/{model_name.capitalize()}-hf"
+        elif "vicuna" in model_name:
+            weights_path = f"lmsys/{model_name}"
+        elif "mixtral" in model_name.lower() or "mistral" in model_name.lower():
+            weights_path = f"mistralai/{model_name}"
+        elif "orca" in model_name.lower() or "phi" in model_name.lower():
+            weights_path = f"microsoft/{model_name}"
+        elif "zephyr" in model_name.lower():
+            weights_path = f"HuggingFaceH4/{model_name}"
+        elif "bloom" in model_name.lower():
+            weights_path = f"bigscience/{model_name}"
+        elif "flan" in model_name.lower():
+            weights_path = f"google/{model_name}"
+        elif "aya" in model_name.lower():
+            weights_path = f"CohereforAI/{model_name}"
+        elif "gemma" in model_name.lower():
+            weights_path = f"google/{model_name}"
+
     # You can also provide loading in 8bit and 4bit format
-    load_in_8bit, load_in_4bit=False, False
-    
+    load_in_8bit, load_in_4bit = False, False
+
     # Add all model parameters when loading the model
     # 1. weights path contains the huggingface model name
     # 2. cache_dir is the directory to save the model cache
@@ -115,16 +139,18 @@ if __name__ == '__main__':
     # 7. device_map is the device to load the model (auto is best for multiple GPU loading)
     # 8. load_in_8bit is the flag to load the model in 8bit format (bitsandbytes)
     # 9. load_in_4bit is the flag to load the model in 4bit format (bitsandbytes)
-    model = load_model(model_name, 
-                        weights_path=weights_path, 
-                        cache_dir=args.cache_dir, 
-                        max_new_tokens=args.max_new_tokens,
-                        max_length=args.max_length, 
-                        temperature=args.temperature,
-                        top_p=args.top_p,
-                        device_map="auto",
-                        load_in_8bit=load_in_8bit,
-                        load_in_4bit=load_in_4bit)
+    model = load_model(
+        model_name,
+        weights_path=weights_path,
+        cache_dir=args.cache_dir,
+        max_new_tokens=args.max_new_tokens,
+        max_length=args.max_length,
+        temperature=args.temperature,
+        top_p=args.top_p,
+        device_map="auto",
+        load_in_8bit=load_in_8bit,
+        load_in_4bit=load_in_4bit,
+    )
 
     # Add model parameters
     logging.info("Loaded model: {}...".format(model_name))
@@ -154,18 +180,22 @@ if __name__ == '__main__':
         "te": "telugu",
         "th": "thai",
         "yo": "yoruba",
-        "zh": "chinese"
+        "zh": "chinese",
     }
 
-    data_loader = NoMIRACLDataLoader(language = language_code_map[args.language], 
-                                    split = args.split, 
-                                    hf_dataset_name="miracl/nomiracl", 
-                                    load_from_huggingface=True)
+    data_loader = NoMIRACLDataLoader(
+        language=language_code_map[args.language],
+        split=args.split,
+        hf_dataset_name="miracl/nomiracl",
+        load_from_huggingface=True,
+    )
 
     corpus, queries, qrels = data_loader.load_data_sample(
-        relevant_ratio = args.relevant_ratio, non_relevant_ratio = args.non_relevant_ratio,
-        max_sample_pool=args.max_sample_pool)
-    
+        relevant_ratio=args.relevant_ratio,
+        non_relevant_ratio=args.non_relevant_ratio,
+        max_sample_pool=args.max_sample_pool,
+    )
+
     ###########################
     # 3. Generate Prompt Data #
     ###########################
@@ -180,11 +210,15 @@ if __name__ == '__main__':
 
         ### This code is added for reproduction, to generate on the same queries are generated used in paper () ####
         # Use the same queries as generated in the paper
-        input_filepath = os.path.join(args.results_dir, subset, f'{args.language}.{args.split}.{args.prompt_template}_prompt.jsonl')
+        input_filepath = os.path.join(
+            args.results_dir,
+            subset,
+            f"{args.language}.{args.split}.{args.prompt_template}_prompt.jsonl",
+        )
         results = util.load_results_as_jsonl(input_filepath=input_filepath)
         MODEL_NAME = "gpt-4-azure"
         generate_query_ids = list(results[MODEL_NAME].keys())
-        
+
         # check how many queries we need to generate additionally
         if not args.overwrite:
             if model_name in results:
@@ -192,28 +226,37 @@ if __name__ == '__main__':
                 for query_id in generate_query_ids:
                     if query_id not in results[model_name]:
                         updated_list.append(query_id)
-                
+
                 generate_query_ids = updated_list
-        
+
         # check whether already queries are generated for the subset
         if len(generate_query_ids) == 0:
-            logging.info(f'Queries already generated for {subset} for {model_name}...')
+            logging.info(f"Queries already generated for {subset} for {model_name}...")
             continue
         else:
-            logging.info(f'Loaded {list(results.keys())} models from subset: {subset} in {input_filepath}...')
-            
+            logging.info(
+                f"Loaded {list(results.keys())} models from subset: {subset} in {input_filepath}..."
+            )
+
             # Generate prompts
-            
+
             final_query_ids = []
             separator = ": "
-            
-            for query_id in tqdm(generate_query_ids, 
-                                 total=len(generate_query_ids), 
-                                 desc=f'Processing {args.language} queries'):
-                
-                if query_id in queries[subset] and len(qrels[subset][query_id]) == max_passage_count:
-                    doc_ids = [doc_id for doc_id in qrels[subset][query_id] if doc_id in corpus]
-                    
+
+            for query_id in tqdm(
+                generate_query_ids,
+                total=len(generate_query_ids),
+                desc=f"Processing {args.language} queries",
+            ):
+
+                if (
+                    query_id in queries[subset]
+                    and len(qrels[subset][query_id]) == max_passage_count
+                ):
+                    doc_ids = [
+                        doc_id for doc_id in qrels[subset][query_id] if doc_id in corpus
+                    ]
+
                     if len(doc_ids) == max_passage_count:
                         passage_list = []
                         query = queries[subset][query_id]
@@ -223,22 +266,31 @@ if __name__ == '__main__':
                                 passage_list.append(passage)
                             else:
                                 logging.error(f"Doc {doc_id} not found in corpus...")
-                        
-                    passages_truncated = [model.truncate_response(p, max_length=args.max_passage_tokens) for p in passage_list]
+
+                    passages_truncated = [
+                        model.truncate_response(p, max_length=args.max_passage_tokens)
+                        for p in passage_list
+                    ]
                     prompt = prompt_cls(query=query, passages=passages_truncated)
                     input_prompts[query_id] = prompt
                     final_query_ids.append(query_id)
-            
-            logging.info(f'Generating responses for {len(input_prompts)} {subset} queries...')
+
+            logging.info(
+                f"Generating responses for {len(input_prompts)} {subset} queries..."
+            )
             if model_name not in results:
                 results[model_name] = {}
 
-            for query_id_chunk in tqdm(util.chunks(final_query_ids, args.batch_size), 
-                                    total=len(final_query_ids) // args.batch_size, 
-                                    desc=f'Processing {args.language} with {model_name}'):
+            for query_id_chunk in tqdm(
+                util.chunks(final_query_ids, args.batch_size),
+                total=len(final_query_ids) // args.batch_size,
+                desc=f"Processing {args.language} with {model_name}",
+            ):
 
                 prompt_list = [input_prompts[query_id] for query_id in query_id_chunk]
-                model_results = model.batch_call(prompt_list, batch_size=args.batch_size)
+                model_results = model.batch_call(
+                    prompt_list, batch_size=args.batch_size
+                )
 
                 # Save model result for each query in model_result
                 for idx, query_id in enumerate(query_id_chunk):
@@ -248,11 +300,12 @@ if __name__ == '__main__':
                 # # Save results
                 output_dir = os.path.join(args.output_dir, subset)
                 os.makedirs(output_dir, exist_ok=True)
-                
+
                 util.save_results_as_jsonl(
                     output_dir=output_dir,
                     results=results,
                     qrels=qrels[subset],
                     prompts=input_prompts,
                     template=args.prompt_template,
-                    filename=f'{args.language}.{args.split}.{args.prompt_template}_prompt.jsonl')
+                    filename=f"{args.language}.{args.split}.{args.prompt_template}_prompt.jsonl",
+                )
