@@ -3,7 +3,7 @@ Usage example: python load_no_miracl.py
 """
 
 from nomiracl.dataset import NoMIRACLDataLoader
-from nomiracl import util, LoggingHandler
+from nomiracl import LoggingHandler
 
 import logging, os
 
