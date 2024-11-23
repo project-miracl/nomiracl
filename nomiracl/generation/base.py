@@ -23,6 +23,10 @@ class BaseGenerator:
         load_in_4bit=False,
         device_map="auto",
         peft=False,
+        concurrency = 1,
+        num_gpus = 1,
+        batch_size = 1,
+        num_partitions = 1
     ):
         self.model_name = model_name
         self.tokenizer = None
@@ -44,9 +48,16 @@ class BaseGenerator:
         self.max_length = max_length
         self.num_return_sequences = num_return_sequences
         self.peft = peft
+        self.concurrency = concurrency
+        self.num_gpus = num_gpus
+        self.batch_size = batch_size
+        self.num_partitions = num_partitions
 
     def __call__(self, prompt: str, **kwargs):
         raise NotImplementedError()
+    
+    def call(self, prompt: str, **kwargs):
+        return self.__call__(prompt, **kwargs)
 
     def post_process_response(self, response):
         return response

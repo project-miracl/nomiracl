@@ -1,4 +1,4 @@
-from nomiracl.generation.base import BaseGenerator
+from nomiracl.generation import BaseGenerator
 
 import requests
 from typing import List

@@ -9,7 +9,6 @@ from .huggingface import (
     BLOOM,
     Mistral,
 )
-
 from .cohere import Cohere
 from .openai import OpenAIxNvidia
 from .azure import GPTxAzure
@@ -20,6 +19,7 @@ RUNTYPES = {
     "huggingface": [Llama, Flan, Pipeline, Falcon, HFAutoModelCausalLM, BLOOM, Mistral],
     "cohere": [Cohere],
     "openai": [OpenAIxNvidia],
+    "nvidia": [OpenAIxNvidia],
     "azure": [GPTxAzure],
     "anyscale": [AnyScale],
     "vllm": [VLLM],
@@ -30,6 +30,7 @@ def load_model(run_type: str, model_name: str, **kwargs):
     Loads model by model_name available in Huggingface.
 
     Args:
+        run_type (str): Type of model to load.
         model_name (str): Name of model to load.
         kwargs: Additional parameters for the generator (e.g., temperature).
 
@@ -40,9 +41,6 @@ def load_model(run_type: str, model_name: str, **kwargs):
 
     if run_type not in RUNTYPES:
         raise NotImplementedError(f"Run type {run_type} not supported. Choose from {list(RUNTYPES.keys())}.")
-    
-    if not any(model_type in model_name for model_type in RUNTYPES[run_type]):
-        raise NotImplementedError(f"Model {model_name} not supported for run type {run_type}. Choose from {RUNTYPES[run_type]}.")
     
     model_cls = None
 

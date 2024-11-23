@@ -1,6 +1,6 @@
 # Initial code structure taken from https://github.com/McGill-NLP/instruct-qa.
 
-from nomiracl.generation.base import BaseGenerator
+from .base import BaseGenerator
 from typing import List
 
 import torch

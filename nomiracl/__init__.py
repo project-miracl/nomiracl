@@ -1,1 +1,1 @@
-from .logging import LoggingHandler
+from nomiracl.logging import LoggingHandler

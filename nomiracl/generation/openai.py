@@ -27,8 +27,11 @@ class OpenAIxNvidia(BaseGenerator):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.client = None
         # directly use the OpenAI API
         if os.getenv("OPENAI_API_KEY"):
+            logger.info("Found OPENAI_API_KEY as an environment variable. Using OpenAI API.")
+            logger.info(f"Loading {self.model_name} model using OpenAI API.")
             self.client = OpenAI(
                 api_key=os.getenv("OPENAI_API_KEY"),
                 organization=os.getenv("OPENAI_ORGANIZATION"),
@@ -36,17 +39,13 @@ class OpenAIxNvidia(BaseGenerator):
         
         # use the NVIDIA API
         elif os.getenv("NVIDIA_API_KEY"):
+            logger.info("Found NVIDIA_API_KEY as an environment variable. Using NVIDIA API.")
+            logger.info(f"Loading {self.model_name} model using OpenAI API.")
             self.client = OpenAI(
                 api_key=os.getenv("NVIDIA_API_KEY"),
                 base_url = "https://integrate.api.nvidia.com/v1",
             )
         
-        assert (
-            self.model_name in self.model_map
-        ), "You should add the model name to the model -> endpoint compatibility mappings."
-        assert self.model_map[self.model_name] in [
-            "chat",
-        ], "Only chat and completions endpoints are implemented. You may want to add other configurations."
         # json error happens if max_new_tokens is inf
         self.max_new_tokens = self.max_new_tokens
 

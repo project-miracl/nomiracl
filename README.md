@@ -1,5 +1,8 @@
-# NoMIRACL: A Multilingual Hallucination Evaluation Dataset for Robust RAGs
+# NoMIRACL: A Multilingual Relevance Assessment Dataset for RAG Applications
 <p align="center">
+    <a href="https://aclanthology.org/2024.findings-emnlp.730/">
+        <img alt="EMNLP2024" src="https://img.shields.io/badge/Citation-EMNLP_2024-orange.svg">
+    </a>
     <a href="https://github.com/project-miracl/nomiracl">
         <img alt="Stars" src="https://img.shields.io/github/stars/project-miracl/nomiracl.svg?style=flat&logo=github&colorB=blue&label=stars">
     </a>
@@ -9,26 +12,23 @@
     <a href="https://github.com/project-miracl/nomiracl/blob/main/LICENSE">
         <img alt="License" src="https://img.shields.io/github/license/project-miracl/nomiracl.svg?style=flat&colorB=green">
     </a>
-    <a href="https://arxiv.org/abs/2312.11361">
-        <img alt="arXiv" src="https://img.shields.io/badge/arXiv-2312.11361-b31b1b.svg">
-    </a>
 </p>
 
 <h4 align="center">
     <a href="./"><img style="float: middle;" width="800" height="570" src="./images/nomiracl-teaser.png" /></a>
-    <footer><br clear="all"/>The image has been generated using miramuseai.net and Adobe Photoshop.</footer>
+    <footer><br clear="all"/>The image has been generated using miramuseai.net and Adobe photoshop.</footer>
 </h4>
 
-NoMIRACL is multilingual hallucination evaluation dataset across 18 diverse languages. It includes both a non-relevant and a relevant subset. The non-relevant subset contains queries with passages manually judged as non-relevant, while the relevant subset includes queries with at least one judged relevant passage. LLM robustness is measured using two key metrics: `hallucination rate` and `error rate`.
+NoMIRACL [[EMNLP'24 Findings]](https://aclanthology.org/2024.findings-emnlp.730/) is a multilingual relevance assessment dataset for evaluating query \& passage relevancy in large language models (LLMs). This is extremely useful in RAG settings, i.e., when a retrieval systems retrieves a subset of passages or documents which either can or cannot be relevant to the user query. The LLM (as the generator) should assess the relevancy and only answer -- *if* a relevant passage is found within the subset, else abstain from answering.
 
-**This repository provides easy code to implement and evaluate diverse LLM baselines using our prompt template on NoMIRACL.**
+**This repository provides starter code to evaluate diverse multilingual LLMs using our prompt template on NoMIRACL.**
 
 For more information, checkout out our publication:
-- [NoMIRACL: Knowing When You Don't Know for Robust Multilingual Retrieval-Augmented Generation](https://arxiv.org/abs/2312.11361) (Thakur et al., ArXiv 2023)
+- [“Knowing When You Don’t Know”: A Multilingual Relevance Assessment Dataset for Robust Retrieval-Augmented Generation](https://aclanthology.org/2024.findings-emnlp.730/) (Thakur et al., :star: EMNLP 2024 Findings)
 
 
 ## :wrench: Installation
-You can install NoMIRACL via pip:
+You can install NoMIRACL code repository via pip:
 
 ```python
 pip install nomiracl
@@ -44,7 +44,7 @@ $ pip install -e .
 
 ## :star: Getting Started
 
-#### 1. Load NoMIRACL Dataset 
+#### 1. Loading NoMIRACL Dataset 
 - 50\% of relevant examples, 50\% of non-relevant, both maximum capped at 250. 
 - Full example available in [sample_load_no_miracl.py](./examples/sample_load_no_miracl.py).
 ```python
