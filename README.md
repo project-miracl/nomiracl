@@ -165,22 +165,6 @@ split = 'test'       # or 'dev' for development split
 nomiracl = datasets.load_dataset('miracl/nomiracl', language, split=f'{split}.{subset}')
 ```
 
-### Model identifiers for evaluation in NoMIRACL
-
-| Acronym | Model Name | Model Link |
-| :-----: | :--------: | :--------: |
-| GPT-4 | `gpt-4-azure`| [AzureAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/) |
-| GPT-3.5 | `gpt-3.5-azure`| [AzureAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/) |
-| Mixtral-7x8B | `Mixtral-8x7B-Instruct-v0.1`| :hugs: [model](https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1) |
-| Mistral-7B | `Mistral-7B-Instruct-v0.2`| :hugs: [model](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2) |
-| Orca-2-13B | `Orca-2-13b`| :hugs: [model](https://huggingface.co/microsoft/Orca-2-13b) |
-| Orca-2-7B | `Orca-2-7b`| :hugs: [model](https://huggingface.co/microsoft/Orca-2-7b) |
-| Aya-101 | `aya-101`| :hugs: [model](https://huggingface.co/CohereForAI/aya-101) |
-| LLAMA-2-70B | `llama-2-70b-chat`| :hugs: [model](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf) |
-| LLAMA-2-13B |`llama-2-13b-chat`| :hugs: [model](https://huggingface.co/meta-llama/Llama-2-13b-chat-hf) |
-| LLAMA-2-7B | `llama-2-7b-chat`| :hugs: [model](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf) |
-| Flan-T5-XXL |`flan-t5-xxl`| :hugs: [model](https://huggingface.co/google/flan-t5-xxl) |
-
 ### Baseline Accuracy on NoMIRACL non-relevant subset (test split, maximum cap of 250 per language)
 
 Baseline results (250 queries) are available within the repository under `./results/baselines/non_relevant`.
@@ -198,29 +182,6 @@ An example datapoint under `./results/baselines/non_relevant/en.test.vanilla_pro
                 "aya-101": "Wales"}
 }
 ```
-
-| Code | Set  | \#Q  | GPT-4 | GPT-3.5 | Mistral-7B | Mixtral-7x8B | LLAMA-2-70B | LLAMA-2-13B | LLAMA-2-7B | flan-t5-xxl | Orca-2-7B | Orca-2-13B | aya-101 |
-|------|----- |------|-------|----------|---------------|--------|---------|-------|----------|-------|---------|---------|---------|
-| ar   | Test | 250   | 61.60% | 46.40% | 87.20% | 89.20% | 0.0% | 15.60% | 0.0% | 0.80% | 3.60% | 10.40% | 23.20% |
-| bn   | Test | 250   | 60.00% | 4.80% | 83.20% | 90.00% | 0.0% | 2.40% | 0.4% | 0.00% | 5.60% | 3.20% | 10.00% |
-| de   | Test | 217   | 63.59% | 53.00% | 87.56% | 68.20% | 0.5% | 5.07% | 0.9% | 3.23% | 5.07% | 12.90% | 29.03% |
-| en   | Test | 250   | 57.20% | 54.80% | 90.00% | 72.40% | 0.0% | 0.80% | 2.8% | 16.40% | 12.00% | 6.80% | 15.60% |
-| es   | Test | 250   | 87.20% | 64.80% | 92.00% | 90.80% | 0.8% | 0.40% | 11.2% | 10.80% | 14.40% | 10.40% | 3.20% |
-| fa   | Test | 250   | 57.20% | 23.60% | 82.40% | 90.40% | 0.0% | 4.80% | 0.0% | 0.40% | 0.40% | 14.00% |  14.40% |
-| fr   | Test | 250   | 52.40% | 44.00% | 82.40% | 58.40% | 0.0% | 0.00% | 0.4% | 2.40% | 6.00% | 9.20% | 22.00% |
-| fi   | Test | 124   | 60.48% | 65.32% | 87.90% | 89.52% | 0.0% | 4.84% | 0.0% | 0.00% | 2.42% | 27.42% | 33.06% |
-| hi   | Test | 250   | 78.80% | 29.60% | 91.60% | 95.60% | 0.0% | 3.20% | 0.8% | 0.00% | 0.40% | 9.20%  | 17.60% |
-| id   | Test | 250   | 63.20% | 56.80% | 89.20% | 83.20% | 0.4% | 4.80% | 1.6% | 6.80% | 2.80% | 14.40% | 19.60% |
-| ja   | Test | 250   | 56.80% | 32.40% | 89.20% | 82.80% | 0.0% | 4.00% | 0.0% | 0.80% | 7.60% | 24.00% | 10.40% |
-| ko   | Test | 250   | 59.60% | 40.00% | 88.40% | 90.00% | 0.0% | 0.80% | 1.2% | 0.00% | 3.60% | 10.80% | 14.40% |
-| ru   | Test | 250   | 58.00% | 34.80% | 90.00% | 78.40% | 0.8% | 4.00% | 0.4% | 1.60% | 11.20% | 9.20% | 31.60% |
-| sw   | Test | 250   | 91.20% | 66.40% | 95.20% | 88.00% | 0.0% | 0.80% | 0.4% | 7.60% | 4.40% | 14.00% | 27.60% |
-| te   | Test | 250   | 74.80% | 6.80% | 81.20% | 84.80% | 0.0% | 0.40% | 0.0% | 1.60% | 6.80% | 8.00% | 24.00% |
-| th   | Test | 250   | 46.80% | 4.00% | 90.40% | 67.20% | 0.0% | 16.40% | 0.0% | 0.80% | 4.40% | 5.60% | 11.20% |
-| yo   | Test | 250   | 75.20% | 74.80% | 95.20% | 89.20% | 0.0% | 1.20% | 0.4% | 12.80% | 13.60% | 14.80% | 20.00% |
-| zh   | Test | 250   | 56.40% | 43.60% | 86.80% | 78.40% | 0.0% | 6.00% | 0.0% | 5.20% | 4.40% | 10.80% | 9.20% |
-| Avg. | Test |  -    | **64.5%** | **41.44%** | **88.33%** | **82.6%** | **0.1%** | **4.2%** | **1.14%** | **3.96%** | **6.04%** | **11.95%** | **18.67%** | 
-
 
 ### Baseline Accuracy on NoMIRACL relevant subset (test split, maximum cap of 250 per language)
 
@@ -240,44 +201,18 @@ An example datapoint under `./results/baselines/relevant/en.test.vanilla_prompt.
 }
 ```
 
-
-| Code | Set  | \#Q  | GPT-4 | GPT-3.5 | Mistral-7B-v0.2 | Mixtral-7x8B | LLAMA-2-70B | LLAMA-2-13B | LLAMA-2-7B | flan-t5-xxl | Orca-2-7B | Orca-2-13B | aya-101 |
-|------|----- |------|-------|----------|---------------|--------|---------|-------|----------|-------|---------|---------|---------|
-| ar   | Test | 250  | 88.40% | 91.20% | 32.80% | 59.20% | 96.40% | 62.40% | 62.0% | 100.0% | 82.80% | 51.60% | 16.40% |
-| bn   | Test | 250  | 82.80% | 64.80% | 26.40% | 43.20% | 97.60% | 42.40% | 71.6% | 100.0% | 40.00% | 80.00% | 20.00% |
-| de   | Test | 217  | 88.40% | 93.60% | 26.80% | 74.40% | 88.80% | 52.80% | 56.4% | 99.2% | 86.00% | 92.00% | 25.60% |
-| en   | Test | 250  | 94.80% | 91.20% | 35.20% | 78.80% | 85.20% | 46.40% | 68.0% | 98.8% | 81.60% | 98.00% | 51.60% |
-| es   | Test | 250  | 77.60% | 90.00% | 26.80% | 67.20% | 77.20% | 34.40% | 48.8% | 99.2% | 64.00% | 95.60% | 78.00% |
-| fa   | Test | 250  | 86.40% | 95.60% | 30.80% | 46.80% | 99.20% | 85.60% | 72.0% | 100.0% | 84.40% | 61.60% | 24.40% |
-| fr   | Test | 250  | 88.40% | 90.40% | 37.60% | 81.60% | 92.00% | 54.80% | 55.6% | 99.6% | 81.60% | 98.00% | 57.20% |
-| fi   | Test | 124  | 84.00% | 87.60% | 24.80% | 65.20% | 98.40% | 6.00% | 93.2% | 100.0% | 79.20% | 75.20% | 23.60% |
-| hi   | Test | 250  | 78.80% | 92.80% | 28.00% | 38.40% | 94.80% | 66.00% | 74.8% | 100.0% | 57.60% | 57.60% | 25.20% |
-| id   | Test | 250  | 66.00% | 74.00% | 11.20% | 48.00% | 83.60% | 32.00% | 71.2% | 100.0% | 73.20% | 79.20% | 60.71% |
-| ja   | Test | 250  | 95.60% | 97.20% | 31.20% | 69.20% | 98.40% | 52.40% | 69.2% | 100.0% | 62.80% | 64.80% | 45.60% |
-| ko   | Test | 250  | 87.20% | 92.40% | 22.40% | 56.00% | 99.60% | 90.00% | 85.6% | 100.0% | 77.60% | 80.00% | 60.00% |
-| ru   | Test | 250  | 93.60% | 94.40% | 32.40% | 77.20% | 83.20% | 61.60% | 96.4% | 100.0% | 79.60% | 85.20% | 22.80% |
-| sw   | Test | 250  | 78.80% | 90.40% | 8.40% | 51.60% | 90.00% | 62.80% | 49.2% | 100.0% | 89.20% | 92.80% | 38.40% |
-| te   | Test | 250  | 58.00% | 45.60% | 14.80% | 33.20% | 99.60% | 74.40% | 97.2% | 100.0% | 44.80% | 73.60% | 10.80% |
-| th   | Test | 250  | 95.60% | 96.40% | 23.60% | 72.80% | 98.80% | 59.20% | 91.2% | 100.0% | 78.00% | 76.00% | 20.80% |
-| yo   | Test | 250  | 85.78% | 64.22% | 8.33% | 34.31% | 91.18% | 62.25% | 62.3% | 99.5% | 79.41% | 82.84% | 18.14% |
-| zh   | Test | 250  | 95.60% | 95.60% | 30.00% | 74.00% | 97.20% | 63.20% | 83.6% | 100.0% | 81.20% | 90.40% | 75.20% |
-| Avg. | Test |  -   | **84.77%** | **85.97%** | **25.09%** | **59.51%** | **92.84%** | **56.04%** | **72.68%** | **99.8%** | **73.50%** | **79.69%** | **37.47%** |  
-
-
 ## NoMIRACL Dataset Construction
 
 <img src="./images/NoMIRACL-Flowchart.drawio.png" width="1013" height="179" />
 
-Retrieval Augmented Generation (RAG) is a powerful approach to incorporate external knowledge into large language models (LLMs) to enhance the accuracy and faithfulness of generated responses. However, evaluating LLM robustness in RAG across different language families has been a challenge, leading to gaps in understanding the model's performance against errors in external retrieved knowledge. To address this, we present NoMIRACL, a human-annotated dataset designed for evaluating LLM robustness in RAG across 18 typologically diverse languages.
-
-NoMIRACL is a multilingual dataset designed to evaluate LLM robustness against errors in first-stage retrieval. The dataset covers 18 typologically diverse languages and includes two subsets: non-relevant and relevant.
+NoMIRACL is a multilingual dataset designed to evaluate LLM robustness in relevance assessment to help avoid errors in first-stage retrieval. The dataset covers 18 typologically diverse languages and includes two subsets: non-relevant and relevant.
 
 ### Non-Relevant Subset (F)
-- Queries with no-known answers.
+- Queries with no-known answers within the retrieved oracle passages.
 - All top-k passages manually judged as non-relevant (relevancy score = 0).
 
 ### Relevant Subset (T)
-- Queries with known answers.
+- Queries with known answers within the retrieved oracle passages.
 - At least one of the top-k passages manually judged as relevant (relevancy score = 1).
 
 ## Evaluation Metrics

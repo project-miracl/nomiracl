@@ -1,5 +1,5 @@
 """
-Usage example: python load_sample_vanilla_prompt.py
+Usage example: python sample_vanilla_prompt.py
 """
 
 from nomiracl.dataset import NoMIRACLDataLoader
