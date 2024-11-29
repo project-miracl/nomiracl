@@ -1,4 +1,4 @@
-'''
+"""
 Usage of VLLM generator for efficient batch inference using Ray Data.
 Suggested tips for usage:
 
@@ -6,7 +6,8 @@ export RAY_DEDUP_LOGS=0
 export RAY_TMPDIR="<your_cache_dir>"
 export DATASETS_HF_HOME="<your_cache_dir>"
 export HF_HOME="<your_cache_dir>"
-'''
+"""
+
 from nomiracl.generation import BaseGenerator
 from vllm import LLM, SamplingParams
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -19,8 +20,10 @@ import datasets
 
 logger = logging.getLogger(__name__)
 
+
 class VLLM(BaseGenerator):
     """VLLM Series Generator for efficient batch inference using Ray Data."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         """
@@ -28,17 +31,22 @@ class VLLM(BaseGenerator):
         """
         # Initialize temporary model and delete to avoid memory leak
         temp_model = AutoModelForCausalLM.from_pretrained(
-            self.model_name, cache_dir=self.cache_dir, trust_remote_code=True)
+            self.model_name, cache_dir=self.cache_dir, trust_remote_code=True
+        )
         del temp_model
 
         # Initialize tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(
-            self.model_name, cache_dir=self.cache_dir, trust_remote_code=True)
+            self.model_name, cache_dir=self.cache_dir, trust_remote_code=True
+        )
 
         # Initialize terminators and stop strings for specific models
         terminators, stop_strings = [], []
         if "llama-3" in self.model_name.lower():
-            terminators = [self.tokenizer.eos_token_id, self.tokenizer.convert_tokens_to_ids("<|eot_id|>")]
+            terminators = [
+                self.tokenizer.eos_token_id,
+                self.tokenizer.convert_tokens_to_ids("<|eot_id|>"),
+            ]
             stop_strings = ["<|eot_id|>"]
 
         # Create sampling params
@@ -65,13 +73,15 @@ class VLLM(BaseGenerator):
 
             def __init__(self):
                 # Create an LLM.
-                    self.llm = LLM(model=model_name, 
-                                max_model_len=max_length, 
-                                max_num_seqs=num_return_sequences,
-                                max_seq_len_to_capture=max_length,
-                                download_dir=cache_dir,
-                                dtype="bfloat16", 
-                                trust_remote_code=True)  # skip graph capturing for faster cold starts)
+                self.llm = LLM(
+                    model=model_name,
+                    max_model_len=max_length,
+                    max_num_seqs=num_return_sequences,
+                    max_seq_len_to_capture=max_length,
+                    download_dir=cache_dir,
+                    dtype="bfloat16",
+                    trust_remote_code=True,
+                )  # skip graph capturing for faster cold starts)
 
             def __call__(self, batch: Dict[str, np.ndarray]) -> Dict[str, list]:
                 # Generate texts from the prompts.
@@ -82,22 +92,24 @@ class VLLM(BaseGenerator):
                 generated_text = []
                 for output in outputs:
                     prompt.append(output.prompt)
-                    generated_text.append(' '.join([o.text for o in output.outputs]))
-                
+                    generated_text.append(" ".join([o.text for o in output.outputs]))
+
                 return {
                     "prompt": batch["prompt"],
                     "output": generated_text,
                 }
 
         logger.info(f"Initialized VLLM with model {model_name}.")
-        
+
         # Create Ray Data dataset from prompts
         final_prompts = []
         for prompt in prompts:
             messages = [{"role": "user", "content": f"{prompt}"}]
-            prompt_template = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+            prompt_template = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
             final_prompts.append({"prompt": prompt_template})
-        
+
         # convert this list of prompts to a HF dataset
         hf_dataset = datasets.Dataset.from_list(final_prompts)
 
@@ -105,7 +117,7 @@ class VLLM(BaseGenerator):
         ds = ray.data.from_huggingface(hf_dataset)
         ds = ds.repartition(12, shuffle=False)
         logger.info("Repartitioned dataset into 12 partitions.")
-        
+
         # Apply batch inference
         ds = ds.map_batches(
             LLMPredictor,
@@ -119,7 +131,7 @@ class VLLM(BaseGenerator):
             batch_size=self.batch_size,
             zero_copy_batch=True,
         )
-        
+
         # Extract results
         results = ds.take_all()
         generated_text = [result["output"] for result in results]

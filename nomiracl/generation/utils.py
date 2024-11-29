@@ -25,6 +25,7 @@ RUNTYPES = {
     "vllm": [VLLM],
 }
 
+
 def load_model(run_type: str, model_name: str, **kwargs):
     """
     Loads model by model_name available in Huggingface.
@@ -40,21 +41,34 @@ def load_model(run_type: str, model_name: str, **kwargs):
     run_type, model_name = run_type.lower(), model_name.lower()
 
     if run_type not in RUNTYPES:
-        raise NotImplementedError(f"Run type {run_type} not supported. Choose from {list(RUNTYPES.keys())}.")
-    
+        raise NotImplementedError(
+            f"Run type {run_type} not supported. Choose from {list(RUNTYPES.keys())}."
+        )
+
     model_cls = None
 
     ### Huggingface models
     if run_type == "huggingface":
-        if "dolly" in model_name or "h2ogpt" in model_name: model_cls = Pipeline
-        elif any(model_type in model_name for model_type in ["vicuna", "alpaca", "llama", "orca"]): model_cls = Llama
-        elif any(model_type in model_name for model_type in ["mistral", "mixtral"]): model_cls = Mistral
-        elif any(model_type in model_name for model_type in ["flan", "aya"]): model_cls = Flan
-        elif any(model_type in model_name for model_type in ["zephyr", "gemma"]): model_cls = HFAutoModelCausalLM
-        elif "falcon" in model_name: model_cls = Falcon
-        elif "bloom" in model_name: model_cls = BLOOM
-        else: raise NotImplementedError(f"Model {model_name} not supported.")
-    
+        if "dolly" in model_name or "h2ogpt" in model_name:
+            model_cls = Pipeline
+        elif any(
+            model_type in model_name
+            for model_type in ["vicuna", "alpaca", "llama", "orca"]
+        ):
+            model_cls = Llama
+        elif any(model_type in model_name for model_type in ["mistral", "mixtral"]):
+            model_cls = Mistral
+        elif any(model_type in model_name for model_type in ["flan", "aya"]):
+            model_cls = Flan
+        elif any(model_type in model_name for model_type in ["zephyr", "gemma"]):
+            model_cls = HFAutoModelCausalLM
+        elif "falcon" in model_name:
+            model_cls = Falcon
+        elif "bloom" in model_name:
+            model_cls = BLOOM
+        else:
+            raise NotImplementedError(f"Model {model_name} not supported.")
+
     ### Rest of the models
     else:
         model_cls = RUNTYPES[run_type][0]
