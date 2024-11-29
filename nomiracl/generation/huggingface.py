@@ -2,18 +2,23 @@
 
 from .base import BaseGenerator
 from typing import List
-
 import torch
 import logging
-from transformers import pipeline
-from peft import AutoPeftModelForCausalLM
-from transformers import (
-    AutoTokenizer,
-    AutoModelForCausalLM,
-    AutoModelForSeq2SeqLM,
-    BloomForCausalLM,
-    BitsAndBytesConfig,
-)
+
+from nomiracl.util import is_accelerate_available, is_peft_available, is_bitsandbytes_available
+
+if is_peft_available():
+    from peft import AutoPeftModelForCausalLM
+
+if is_accelerate_available() and is_bitsandbytes_available():
+    from transformers import (
+        pipeline,
+        AutoTokenizer,
+        AutoModelForCausalLM,
+        AutoModelForSeq2SeqLM,
+        BloomForCausalLM,
+        BitsAndBytesConfig,
+    )
 
 logger = logging.getLogger(__name__)
 
