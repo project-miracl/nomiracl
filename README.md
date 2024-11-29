@@ -34,6 +34,12 @@ You can install NoMIRACL code repository via pip:
 pip install nomiracl
 ```
 
+Optional dependencies:
+```python
+pip install nomiracl[hf]   # install accelerate, bitsandbytes & peft
+pip install nomiracl[vllm] # install vllm & dependencies 
+```
+
 If you want to build from source, use:
 
 ```bash
