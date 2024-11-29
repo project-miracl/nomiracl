@@ -2,6 +2,7 @@
 /results/eval/
 /results/baselines-new/
 test.ipynb
+test.py
 
 
 # Byte-compiled / optimized / DLL files
