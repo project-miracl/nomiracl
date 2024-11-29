@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nomiracl"
-version = "0.0.2"
+version = "1.0.0"
 description = "Multilingual Relevance Assessment for RAG Applications"
 license = { text = "Apache 2.0" }
 readme = "README.md"

@@ -17,6 +17,7 @@ from transformers import (
 
 logger = logging.getLogger(__name__)
 
+
 ######################################
 # HuggingFace LLAMA Series Generator #
 ######################################
@@ -28,7 +29,7 @@ class Llama(BaseGenerator):
         assert (
             self.weights_path is not None
         ), "A path to model weights must be defined for using this generator."
-        
+
         # LLAMA models are left-padded
         logger.info("Loading LLAMA model with left padding.")
         self.tokenizer = AutoTokenizer.from_pretrained(
@@ -39,9 +40,9 @@ class Llama(BaseGenerator):
         if "llama-3" in self.weights_path.lower():
             self.terminators = [
                 self.tokenizer.eos_token_id,
-                self.tokenizer.convert_tokens_to_ids("<|eot_id|>")
+                self.tokenizer.convert_tokens_to_ids("<|eot_id|>"),
             ]
-        
+
         # check if the model is a PEFT model
         if self.peft:
             self.model = AutoPeftModelForCausalLM.from_pretrained(
@@ -52,7 +53,7 @@ class Llama(BaseGenerator):
                 trust_remote_code=True,
             )
             self.model.eval()
-        
+
         else:
 
             quantization_config = BitsAndBytesConfig(
@@ -105,7 +106,9 @@ class Llama(BaseGenerator):
             top_p=self.top_p,
             max_new_tokens=self.max_new_tokens,
             min_new_tokens=self.min_new_tokens,
-            eos_token_id=self.terminators if "llama-3" in self.weights_path.lower() else None
+            eos_token_id=(
+                self.terminators if "llama-3" in self.weights_path.lower() else None
+            ),
         )
 
         return [

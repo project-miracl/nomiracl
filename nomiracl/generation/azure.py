@@ -9,6 +9,7 @@ import tiktoken
 
 logger = logging.getLogger(__name__)
 
+
 #################################
 # Azure GPT-3.5/GPT-4 Generator #
 #################################
@@ -31,7 +32,7 @@ class GPTxAzure(BaseGenerator):
         self.deployment_map = {
             "gpt-3.5-turbo": "gpt-35-turbo",
             "gpt-4": "gpt-4",
-            "gpt-4o": "gpt-4o"
+            "gpt-4o": "gpt-4o",
         }
         assert (
             self.model_name in self.model_map

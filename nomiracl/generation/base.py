@@ -2,6 +2,7 @@ from tqdm.auto import tqdm
 from typing import List
 import torch
 
+
 class BaseGenerator:
     def __init__(
         self,
@@ -23,10 +24,10 @@ class BaseGenerator:
         load_in_4bit=False,
         device_map="auto",
         peft=False,
-        concurrency = 1,
-        num_gpus = 1,
-        batch_size = 1,
-        num_partitions = 1
+        concurrency=1,
+        num_gpus=1,
+        batch_size=1,
+        num_partitions=1,
     ):
         self.model_name = model_name
         self.tokenizer = None
@@ -55,14 +56,16 @@ class BaseGenerator:
 
     def __call__(self, prompt: str, **kwargs):
         raise NotImplementedError()
-    
+
     def call(self, prompt: str, **kwargs):
         return self.__call__(prompt, **kwargs)
 
     def post_process_response(self, response):
         return response
 
-    def batch_call(self, prompts: List[str], batch_size: int = 1, **kwargs) -> List[str]:
+    def batch_call(
+        self, prompts: List[str], batch_size: int = 1, **kwargs
+    ) -> List[str]:
         batches = [
             prompts[i : i + batch_size] for i in range(0, len(prompts), batch_size)
         ]

@@ -5,7 +5,7 @@ from .huggingface import (
     Falcon,
     HFAutoModelCausalLM,
     BLOOM,
-    Mistral
+    Mistral,
 )
 from .base import BaseGenerator
 from .cohere import Cohere

@@ -162,10 +162,10 @@ class NoMIRACLDataLoader(DataLoader):
         """
         for subset in [self.relevant_str, self.non_relevant_str]:
             dataset_hf = datasets.load_dataset(
-                self.hf_dataset_name, 
-                self.language, 
+                self.hf_dataset_name,
+                self.language,
                 split=f"{self.split}.{subset}",
-                trust_remote_code=True # Trust the remote code (else prompt will appear)
+                trust_remote_code=True,  # Trust the remote code (else prompt will appear)
             )
             for row in dataset_hf:
                 query_id = row["query_id"]

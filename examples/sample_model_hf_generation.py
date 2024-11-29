@@ -35,22 +35,22 @@ cache_dir = "/mnt/users/n3thakur/cache"  # Directory to save the model cache
 logging.info("Loading model: {}...".format(model_name))
 
 model = load_model(
-    "huggingface", # run_type
-    model_name, # model_name
-    weights_path=weights_path, # extra kwargs
-    cache_dir=cache_dir, # extra kwargs
-    temperature=temperature, # extra kwargs
-    top_p=top_p, # extra kwargs
-    max_new_tokens=max_new_tokens # extra kwargs
+    "huggingface",  # run_type
+    model_name,  # model_name
+    weights_path=weights_path,  # extra kwargs
+    cache_dir=cache_dir,  # extra kwargs
+    temperature=temperature,  # extra kwargs
+    top_p=top_p,  # extra kwargs
+    max_new_tokens=max_new_tokens,  # extra kwargs
 )
 
 # for vllm, we provide the following extra kwargs:
 # batch_size, num_gpus, concurrency.
 # model = load_model(
 #     "vllm", # run_type
-#     weights_path, # model_name 
+#     weights_path, # model_name
 #     cache_dir="<your-cache-dir>", # extra kwargs
-#     batch_size=2, # extra kwargs - set based on max length 
+#     batch_size=2, # extra kwargs - set based on max length
 #     num_gpus=1, # extra kwargs - set as 1 always
 #     concurrency=2 # extra kwargs - set as count(GPUs)
 # )
