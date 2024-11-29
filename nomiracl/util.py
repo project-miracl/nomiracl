@@ -1,10 +1,47 @@
 from typing import List, Optional, Dict, Union
 from tqdm.autonotebook import tqdm
+from importlib.metadata import PackageNotFoundError, metadata
 
 import os
 import json
 import shutil
 import requests
+
+
+# Referenced from https://github.com/UKPLab/sentence-transformers/blob/master/sentence_transformers/util.py
+def check_package_availability(package_name: str, owner: str) -> bool:
+    """
+    Checks if a package is available from the correct owner.
+    """
+    try:
+        meta = metadata(package_name)
+        return meta["Name"] == package_name and owner in meta["Home-page"]
+    except PackageNotFoundError:
+        return False
+
+def is_vllm_available() -> bool:
+    """
+    Returns True if the vllm-project `vllm` library is available.
+    """
+    return check_package_availability("vllm", "vllm-project")
+
+def is_accelerate_available() -> bool:
+    """
+    Returns True if the huggingface accelerate library is available.
+    """
+    return check_package_availability("accelerate", "huggingface")
+
+def is_bitsandbytes_available() -> bool:
+    """
+    Returns True if the bitsandbytes library is available.
+    """
+    return check_package_availability("bitsandbytes", "bitsandbytes-foundation")
+
+def is_peft_available() -> bool:
+    """
+    Returns True if the peft library is available.
+    """
+    return check_package_availability("peft", "huggingface")
 
 
 def count_word(sentence: str, word: str) -> int:

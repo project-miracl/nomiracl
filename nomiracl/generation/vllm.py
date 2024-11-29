@@ -9,14 +9,16 @@ export HF_HOME="<your_cache_dir>"
 """
 
 from nomiracl.generation import BaseGenerator
-from vllm import LLM, SamplingParams
 from transformers import AutoModelForCausalLM, AutoTokenizer
-import pandas as pd
-import numpy as np
-from typing import List, Dict
-import ray
+from nomiracl.util import is_vllm_available
 import logging
 import datasets
+from typing import List, Dict
+import numpy as np
+
+if is_vllm_available():
+    from vllm import LLM, SamplingParams
+    import ray
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +32,8 @@ class VLLM(BaseGenerator):
         Initialize the VLLM generator with model configuration and parameters.
         """
         # Initialize temporary model and delete to avoid memory leak
+        # Ray initialization downloads the model X times on each GPU - need to fix in future.
+        # For now temporary solution to download the model once using Huggingface.
         temp_model = AutoModelForCausalLM.from_pretrained(
             self.model_name, cache_dir=self.cache_dir, trust_remote_code=True
         )
