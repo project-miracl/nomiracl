@@ -46,7 +46,7 @@ def test_prompt_generation(test_data):
     query, passages, expected_output = test_data
 
     # Load the prompt template
-    prompt_cls = load_prompt_template("explanation", count=10)
+    prompt_cls = load_prompt_template("role", count=10)
     
     # Generate the prompt
     prompt = prompt_cls(query=query, passages=passages)
